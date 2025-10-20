@@ -13,8 +13,11 @@ import brigadeiro from '../assets/brigadeiro.png'
 import beijinho from '../assets/beijinho.png'
 import bolo1 from '../assets/bolo_1.png'
 import bolo2 from '../assets/bolo_2.png'
-import folhadoCastanha from '../assets/FolhadodeCastanha.jpg'
-import folhadoFile from '../assets/FolhadodeFilé.jpg'
+import folhadoCastanha from '../assets/Folhado de Castanha.jpg'
+import folhadoFile from '../assets/Folhado de Filé .jpg'
+import folhadoFioOvos from '../assets/Folhado de Fio de Ovos.jpg'
+import folhadoPeru from '../assets/Folhado de Peru.jpg'
+import folhadoFrango from '../assets/Folhado de frango.jpg'
 import noImage from '../assets/No_image.png'
 
 const MenuPage = ({ cartItems, addToCart, removeFromCart, getTotalPrice, generateWhatsAppMessage }) => {
@@ -74,7 +77,7 @@ const MenuPage = ({ cartItems, addToCart, removeFromCart, getTotalPrice, generat
     { id: 4, name: 'Camarão', description: 'Folhado de camarão', price: 90.00, unit: 'cento', image: noImage },
     { id: 5, name: 'Carne', description: 'Folhado de carne', price: 84.00, unit: 'cento', image: noImage },
     { id: 6, name: 'Carne com Azeitona', description: 'Folhado de carne com azeitona', price: 84.00, unit: 'cento', image: noImage },
-    { id: 7, name: 'Frango', description: 'Folhado de frango', price: 84.00, unit: 'cento', image: noImage },
+    { id: 7, name: 'Frango', description: 'Folhado de frango', price: 84.00, unit: 'cento', image: folhadoFrango },
     { id: 8, name: 'Frango com Catupiry', description: 'Folhado de frango com catupiry', price: 84.00, unit: 'cento', image: noImage },
     { id: 9, name: 'Palmito', description: 'Folhado de palmito', price: 84.00, unit: 'cento', image: noImage },
     { id: 10, name: 'Palmito com Azeitona', description: 'Folhado de palmito com azeitona', price: 84.00, unit: 'cento', image: noImage },
@@ -82,7 +85,9 @@ const MenuPage = ({ cartItems, addToCart, removeFromCart, getTotalPrice, generat
     { id: 12, name: 'Presunto e Queijo', description: 'Folhado de presunto e queijo', price: 84.00, unit: 'cento', image: noImage },
     { id: 13, name: 'Queijo', description: 'Folhado de queijo', price: 84.00, unit: 'cento', image: noImage },
     { id: 100, name: 'Folhado de Castanha', description: 'Folhado de castanha', price: 84.00, unit: 'cento', image: folhadoCastanha },
-    { id: 101, name: 'Folhado de Filé', description: 'Folhado de filé', price: 94.00, unit: 'cento', image: folhadoFile }
+    { id: 101, name: 'Folhado de Filé', description: 'Folhado de filé', price: 94.00, unit: 'cento', image: folhadoFile },
+    { id: 102, name: 'Folhado de Fio de Ovos', description: 'Folhado de fio de ovos', price: 90.00, unit: 'cento', image: folhadoFioOvos },
+    { id: 103, name: 'Folhado de Peru', description: 'Folhado de peru', price: 90.00, unit: 'cento', image: folhadoPeru }
   ]
 
   const salgadosFritos = [
