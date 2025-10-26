@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from './ui/button'
 import { Plus, Minus } from 'lucide-react'
 
+
+
 // Função para formatação de moeda brasileira
 const formatCurrency = (value) => {
   return value.toFixed(2).replace('.', ',')
