@@ -11,14 +11,34 @@ const formatCurrency = (value) => {
 }
 
 const MenuItem = ({ item, addToCart }) => {
-  const [quantity, setQuantity] = useState(item.unit === 'cento' ? 25 : 1)
+  const getInitialQuantity = () => {
+    if (item.unit === 'cento') return 25
+    if (item.unit === 'unidade') return 1
+    return 1
+  }
+  const [quantity, setQuantity] = useState(getInitialQuantity())
+  const step = item.unit === 'cento' ? 25 : 1
+  
+  const handleQuantityChange = (newQuantity) => {
+    if (item.unit === 'cento') {
+      // Múltiplos de 25, mínimo 25
+      if (newQuantity >= 25) {
+        setQuantity(Math.round(newQuantity / 25) * 25)
+      } else {
+        setQuantity(25)
+      }
+    } else {
+      // Mínimo 1
+      setQuantity(Math.max(1, newQuantity))
+    }
+  }
   
   return (
-    <Card key={item.id} className="card-hover">
+    <Card key={item.id} className="card-hover h-full flex flex-col">
       <CardHeader>
         <img src={item.image} alt={item.name} className="product-image w-full h-32" />
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-grow">
         <CardTitle className="font-montserrat text-base">{item.name}</CardTitle>
         <CardDescription className="font-open-sans text-xs mb-2">
           {item.description}
@@ -27,12 +47,12 @@ const MenuItem = ({ item, addToCart }) => {
           R$ {formatCurrency(item.price)} / {item.unit}
         </p>
       </CardContent>
-      <CardFooter className="flex flex-col items-center">
+      <CardFooter className="flex flex-col items-center mt-auto">
         <div className="flex items-center space-x-1 mb-2">
           <Button 
             size="sm" 
             className="quantity-btn"
-            onClick={() => setQuantity(prev => Math.max(item.unit === 'cento' ? 25 : 1, prev - (item.unit === 'cento' ? 25 : 1)))}
+            onClick={() => handleQuantityChange(quantity - step)}
           >
             <Minus className="w-4 h-4" />
           </Button>
@@ -42,7 +62,7 @@ const MenuItem = ({ item, addToCart }) => {
           <Button 
             size="sm" 
             className="quantity-btn"
-            onClick={() => setQuantity(prev => prev + (item.unit === 'cento' ? 25 : 1))}
+            onClick={() => handleQuantityChange(quantity + step)}
           >
             <Plus className="w-4 h-4" />
           </Button>

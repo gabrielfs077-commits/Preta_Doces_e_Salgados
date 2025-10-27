@@ -217,9 +217,9 @@ const MenuPage = ({ cartItems, addToCart, removeFromCart, getTotalPrice, generat
                       <label className="block text-sm font-medium mb-2">Peso (kg):</label>
                       <input
                         type="number"
-                        min="1"
+                        min="1.5"
                         value={boloPersonalizado.peso}
-                        onChange={(e) => setBoloPersonalizado({...boloPersonalizado, peso: parseInt(e.target.value) || 1})}
+                        onChange={(e) => setBoloPersonalizado({...boloPersonalizado, peso: parseFloat(e.target.value) || 1.5})}
                         className="w-full p-2 border rounded"
                       />
                     </div>
@@ -269,9 +269,9 @@ const MenuPage = ({ cartItems, addToCart, removeFromCart, getTotalPrice, generat
                     className="btn-primary w-full mt-4 font-open-sans"
                     onClick={() => addToCart({
                       id: 'bolo_personalizado',
-                      name: `Bolo Personalizado (${boloPersonalizado.peso}kg)`,
-                      description: `Sabor: ${boloPersonalizado.sabor}, Cobertura: ${boloPersonalizado.cobertura}`,
-                      price: boloPersonalizado.peso * 110,
+                      name: `Bolo Personalizado (${boloPersonalizado.peso.toFixed(1)}kg)`,
+                      description: `Sabor: ${boloPersonalizado.sabor}, Cobertura: ${boloPersonalizado.cobertura}, Obs: ${boloPersonalizado.observacoes}`,
+                      price: boloPersonalizado.peso * 110.00,
                       unit: 'unidade',
                       image: 'bolo_1.png'
                     }, 1)}

@@ -8,6 +8,13 @@ const formatCurrency = (value) => {
 }
 
 const CartSidebar = ({ cartItems, removeFromCart, getTotalPrice, generateWhatsAppMessage }) => {
+  const [pickupDate, setPickupDate] = useState('')
+  const [pickupTime, setPickupTime] = useState('')
+  
+  const handleFinalizeOrder = () => {
+    const message = generateWhatsAppMessage('', pickupDate, pickupTime)
+    window.open(`https://wa.me/5561992552565?text=${message}`, '_blank')
+  }
   return (
     <div className="w-80 bg-white p-6 rounded-lg shadow-md h-fit sticky top-32">
       <div className="flex items-center mb-4">
@@ -59,6 +66,30 @@ const CartSidebar = ({ cartItems, removeFromCart, getTotalPrice, generateWhatsAp
           </div>
 
           <div className="border-t pt-4">
+            {/* Opções de Retirada */}
+            <h4 className="font-montserrat font-semibold text-base mb-2">Opções de Retirada</h4>
+            <div className="mb-4 space-y-2">
+              <div>
+                <label className="block text-xs font-medium mb-1">Data de Retirada:</label>
+                <input
+                  type="date"
+                  value={pickupDate}
+                  onChange={(e) => setPickupDate(e.target.value)}
+                  className="w-full p-2 border rounded text-sm font-open-sans"
+                  min={new Date().toISOString().split('T')[0]} // Data mínima é hoje
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1">Horário de Retirada:</label>
+                <input
+                  type="time"
+                  value={pickupTime}
+                  onChange={(e) => setPickupTime(e.target.value)}
+                  className="w-full p-2 border rounded text-sm font-open-sans"
+                  step="1800" // Intervalos de 30 minutos
+                />
+              </div>
+            </div>
             <div className="flex justify-between items-center mb-4">
               <span className="text-lg font-montserrat font-semibold">Total:</span>
               <span className="text-xl font-montserrat font-bold text-primary">
@@ -67,10 +98,8 @@ const CartSidebar = ({ cartItems, removeFromCart, getTotalPrice, generateWhatsAp
             </div>
             <Button 
               className="w-full btn-primary font-open-sans"
-              onClick={() => {
-                const message = generateWhatsAppMessage()
-                window.open(`https://wa.me/5561992552565?text=${message}`, '_blank')
-              }}
+              onClick={handleFinalizeOrder}
+              disabled={!pickupDate || !pickupTime}
             >
               Finalizar Pedido
             </Button>
