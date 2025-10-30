@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Configuração para GitHub Pages
+  base: '/Preta_Doces_e_Salgados/',
 
   plugins: [react()],
   server: {
