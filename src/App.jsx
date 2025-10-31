@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import Header from './components/Header'
 import HomePage from './components/HomePage'
 import MenuPage from './components/MenuPage'
@@ -12,7 +12,29 @@ const formatCurrency = (value) => {
 }
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home')
+  const getCurrentPageFromHash = () => {
+    const hash = window.location.hash.replace('#/', '')
+    if (['home', 'menu', 'cart', 'contact'].includes(hash)) {
+      return hash
+    }
+    return 'home'
+  }
+  
+  const [currentPage, setCurrentPage] = useState(getCurrentPageFromHash())
+
+  // Atualiza a página quando o hash da URL muda
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentPage(getCurrentPageFromHash())
+    }
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
+  const navigate = useCallback((page) => {
+    window.location.hash = `/${page}`
+    setCurrentPage(page)
+  }, [])
   const [cartItems, setCartItems] = useState([])
 
   // Função para adicionar item ao carrinho
@@ -85,7 +107,7 @@ function App() {
   const renderCurrentPage = () => {
     switch (currentPage) {
       case 'home':
-        return <HomePage setCurrentPage={setCurrentPage} />
+        return <HomePage navigate={navigate} />
       case 'menu':
         return (
           <MenuPage 
@@ -116,7 +138,7 @@ function App() {
     <div className="App">
       <Header 
         currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
+        navigate={navigate}
         cartItems={cartItems}
       />
       {renderCurrentPage()}

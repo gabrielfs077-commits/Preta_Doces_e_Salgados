@@ -2,7 +2,7 @@ import React from 'react'
 import { Button } from './ui/button'
 import { Heart } from 'lucide-react'
 
-const HomePage = ({ setCurrentPage }) => {
+const HomePage = ({ navigate }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50">
       <div className="container mx-auto px-4 py-16">
@@ -15,7 +15,7 @@ const HomePage = ({ setCurrentPage }) => {
           </p>
           <Button 
             className="btn-primary text-lg px-8 py-3 font-open-sans"
-            onClick={() => setCurrentPage('menu')}
+            onClick={() => navigate('menu')}
           >
             Ver Cardápio
           </Button>

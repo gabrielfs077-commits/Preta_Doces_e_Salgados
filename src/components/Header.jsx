@@ -2,7 +2,7 @@ import React from 'react'
 import { Button } from './ui/button'
 import { ShoppingCart } from 'lucide-react'
 
-const Header = ({ currentPage, setCurrentPage, cartItems }) => {
+const Header = ({ currentPage, navigate, cartItems }) => {
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0)
 
   // Badges numerados para cada página
@@ -21,7 +21,7 @@ const Header = ({ currentPage, setCurrentPage, cartItems }) => {
           <Button 
             variant={currentPage === 'home' ? 'secondary' : 'ghost'} 
             className={`nav-btn font-open-sans relative ${currentPage === 'home' ? 'bg-white text-slate-700' : 'text-white hover:bg-slate-600'}`}
-            onClick={() => setCurrentPage('home')}
+            onClick={() => navigate('home')}
           >
             Início
             <span className={`absolute -top-2 -right-2 ${pageBadges.home.color} text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold`}>
@@ -31,7 +31,7 @@ const Header = ({ currentPage, setCurrentPage, cartItems }) => {
           <Button 
             variant={currentPage === 'menu' ? 'secondary' : 'ghost'} 
             className={`nav-btn font-open-sans relative ${currentPage === 'menu' ? 'bg-white text-slate-700' : 'text-white hover:bg-slate-600'}`}
-            onClick={() => setCurrentPage('menu')}
+            onClick={() => navigate('menu')}
           >
             Cardápio
             <span className={`absolute -top-2 -right-2 ${pageBadges.menu.color} text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold`}>
@@ -41,7 +41,7 @@ const Header = ({ currentPage, setCurrentPage, cartItems }) => {
           <Button 
             variant={currentPage === 'contact' ? 'secondary' : 'ghost'} 
             className={`nav-btn font-open-sans relative ${currentPage === 'contact' ? 'bg-white text-slate-700' : 'text-white hover:bg-slate-600'}`}
-            onClick={() => setCurrentPage('contact')}
+            onClick={() => navigate('contact')}
           >
             Contato
             <span className={`absolute -top-2 -right-2 ${pageBadges.contact.color} text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold`}>
@@ -51,7 +51,7 @@ const Header = ({ currentPage, setCurrentPage, cartItems }) => {
           <Button 
             variant={currentPage === 'cart' ? 'secondary' : 'ghost'} 
             className={`nav-btn font-open-sans relative ${currentPage === 'cart' ? 'bg-white text-slate-700' : 'text-white hover:bg-slate-600'}`}
-            onClick={() => setCurrentPage('cart')}
+            onClick={() => navigate('cart')}
           >
             <ShoppingCart className="w-4 h-4 mr-1" />
             Carrinho
