@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
-    allowedHosts: ["5173-igvvqb4ipvnnul0dmoklq-8f16df96.manus.computer"]
+    allowedHosts: ["5173-igvvqb4ipvnnul0dmoklq-8f16df96.manus.computer", "5173-ihq5gxo95rjy7vi7ozcbr-5a7a77bf.manus.computer"]
 
   },
   build: {
