@@ -1,14 +1,14 @@
-# Preta Doces e Salgados 🍩🥐
+# Preta Doces e Salgados 
 
 Um web app Single Page Application (SPA) responsivo e *mobile-first*, criado sob medida para otimizar os pedidos e a exibição do catálogo de salgados, doces e bolos sob encomenda da **Preta Doces e Salgados**.
 
-## 🚀 Visão Geral do Projeto
+##  Visão Geral do Projeto
 
 Este projeto foi reestruturado para ser uma aplicação **100% Vanilla** (HTML5, CSS3, e JavaScript ES6+ puros), sem depender de frameworks pesados (como React, Vue ou bibliotecas CSS como Tailwind). 
 
 O foco foi atingir **performance máxima**, controle total de estilização para uma estética minimalista, e uma experiência de usuário (UX) comparável à de um aplicativo nativo no celular.
 
-## ✨ Principais Funcionalidades
+## Principais Funcionalidades
 
 - **Catálogo Dinâmico e Responsivo**: Produtos renderizados dinamicamente a partir de um banco de dados local (`data.js`), categorizados em abas intuitivas (Salgados, Doces, Bolos, Destaques).
 - **SPA (Single Page Application)**: Navegação super-rápida entre as páginas "Início", "Cardápio", "Contato" e "Carrinho" utilizando a History API do navegador e manipulação de estado, sem recarregamento da página.
@@ -18,7 +18,7 @@ O foco foi atingir **performance máxima**, controle total de estilização para
 - **Lightbox Integrado**: Toque/clique nas imagens de produtos para visualizá-las em formato imersivo.
 - **Event Delegation**: Toda a escuta de eventos do app (cliques, mudanças) foi centralizada no topo (`app.js`), mantendo a memória limpa e o código resistente a perdas de referência após a renderização (re-render) dos componentes.
 
-## 🛠️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **HTML5**: Estrutura semântica focada em SEO e acessibilidade (aria-labels, roles).
 - **CSS3 (Vanilla)**:
@@ -30,7 +30,7 @@ O foco foi atingir **performance máxima**, controle total de estilização para
   - Padrão estrutural leve de componentes baseados em *Template Literals*.
   - Gerenciamento de Estado (`appState`).
 
-## 📁 Estrutura de Arquivos Principal
+## Estrutura de Arquivos Principal
 
 O repositório está focado nas pastas que impulsionam o site hoje:
 
@@ -47,7 +47,7 @@ O repositório está focado nas pastas que impulsionam o site hoje:
 └── README.md          # Esta documentação
 ```
 
-## 🤝 Fluxo do Usuário (Onboarding -> Checkout)
+## Fluxo do Usuário (Onboarding -> Checkout)
 
 1. **Chegada (Hero e Onboarding)**: O usuário abre a Home, que não possui distração com navegação confusa (o Header exibe a logo em formato textual elegante). O usuário é recepcionado pela introdução e os passos de *Como fazer o pedido*.
 2. **Exploração**: Na aba de cardápio, a adição e remoção é rápida (botões + e -), com a *Bottom Bar* móvel aparecendo quando algo é inserido no carrinho.
