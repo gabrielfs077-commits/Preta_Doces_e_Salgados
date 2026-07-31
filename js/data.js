@@ -69,21 +69,21 @@ const PRODUTOS = [
   // --- SALGADOS FRITOS ---
   { id: 16, name: 'Aipim com Carne de Sol',                 price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
   { id: 17, name: 'Aipim com Queijo',                       price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
-  { id: 18, name: 'B. de Azeitona com Queijo',              price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
-  { id: 19, name: 'B. de Calabresa',                        price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
-  { id: 20, name: 'Cox. com Catupiry',                      price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
+  { id: 18, name: 'Bolinha de Azeitona com Queijo',         price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
+  { id: 19, name: 'Bolinha de Calabresa',                   price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
+  { id: 20, name: 'Coxinha com Catupiry',                   price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
   { id: 21, name: 'Coxinha Comum',                          price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'top5', ranking: 4 },
   { id: 22, name: 'Kibe',                                   price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
-  { id: 23, name: 'Kibe c/ Queijo',                         price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
-  { id: 24, name: 'Mar. de Milho com Bacon',                price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
+  { id: 23, name: 'Kibe com Queijo',                        price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
+  { id: 24, name: 'Maravilha de Milho com Bacon',           price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
   { id: 25, name: 'Maravilha de Queijo',                    price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
-  { id: 26, name: 'P\u00e9rola de Queijo',                        price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
-  { id: 27, name: 'Risole \u2013 Gorgonzola',                     price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
-  { id: 28, name: 'Risole \u2013 Presunto e Queijo',               price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
-  { id: 29, name: 'Risole de Bacalhau',                     price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
-  { id: 30, name: 'Risole de Camarão',                        price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
-  { id: 31, name: 'Risole de Carne',                        price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
-  { id: 32, name: 'Risole de Milho',                        price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
+  { id: 26, name: 'Pérola de Queijo',                        price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
+  { id: 27, name: 'Risoles de Gorgonzola',                  price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
+  { id: 28, name: 'Risoles de Presunto e Queijo',           price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
+  { id: 29, name: 'Risoles de Bacalhau',                    price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
+  { id: 30, name: 'Risoles de Camarão',                      price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
+  { id: 31, name: 'Risoles de Carne',                       price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
+  { id: 32, name: 'Risoles de Milho',                       price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
 
   // --- SALGADOS ASSADOS ---
   { id: 33, name: 'Empadas de Bacalhau',                    price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
@@ -95,8 +95,8 @@ const PRODUTOS = [
   { id: 100, name: 'Quiche de Bacon',                          price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
   { id: 101, name: 'Quiche de Tomate Seco',                    price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
   { id: 102, name: 'Quiche de Ricota',                         price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
-  { id: 39, name: 'Enrol. de Queijo',                       price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
-  { id: 40, name: 'Enrol. de Salsicha',                     price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
+  { id: 39, name: 'Enroladinho de Queijo',                   price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
+  { id: 40, name: 'Enroladinho de Salsicha',                 price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
   { id: 41, name: 'Esfirra Carne',                          price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados',  rankVendido: 'destaque' },
   { id: 42, name: 'Esfirra de Ricota',                      price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
   { id: 43, name: 'Esfirra Frango',                         price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
@@ -200,8 +200,6 @@ const WHATSAPP_NUMERO = '5561992552565';
 
 /**
  * Normaliza o nome do produto para gerar um nome de arquivo seguro e limpo.
- * Exemplo: 'Cajuzinho' -> 'cajuzinho'
- * Exemplo: 'Cox. com Catupiry' -> 'coxcomcatupiry'
  */
 function normalizarNomeImagem(nome) {
   return nome
@@ -211,48 +209,61 @@ function normalizarNomeImagem(nome) {
     .replace(/[^a-z0-9]/g, '');      // Remove espaços, traços e pontuações
 }
 
-// Mapeamento de exceções para as imagens que já existem fisicamente no disco
+// Mapeamento de exceções para as imagens físicas disponíveis nas pastas
 const MAPA_IMAGENS_EXISTENTES = {
   // Salgados Folhados
   'alho poró – creme cheese': 'Alho.webp',
+  'banana com queijo': 'Banana.webp',
+  'camarão': 'Folhadodecamarao.webp',
   'castanha do pará': 'Folhadodecastanha.webp',
-  'filé': 'Folhadodecarndesol.webp',
+  'filé': 'Folhadodefile.webp',
   'fio de ovos com bacon': 'Fiodeovos.webp',
   'frango catupirí': 'Folhadodefrango.webp',
   'peito de peru com abacaxi': 'Folhadodeperu.webp',
-  'romeu e julieta': 'Banana.Romeu.webp',
-  'banana com queijo': 'Banana.Romeu.webp',
-  'camarão': 'Folhadodecamarao.webp',
+  'romeu e julieta': 'Romeu.webp',
 
   // Salgados Fritos
+  'aipim com carne de sol': 'Aipim com carne de sol.jpeg',
+  'aipim com queijo': 'Aipim com carne de sol.jpeg',
+  'coxinha com catupiry': 'Coxinha.webp',
   'coxinha comum': 'Coxinha.webp',
+  'kibe': 'Kibe comum.jpeg',
+  'kibe com queijo': 'Kibe com queijo.jpeg',
+  'maravilha de milho com bacon': 'Maravilha de Queijo.jpeg',
+  'maravilha de queijo': 'Maravilha de Queijo.jpeg',
+  'risoles de bacalhau': 'Risole de Bacalhau.jpeg',
+  'risoles de camarão': 'Risole de Camarao.jpeg',
+  'risoles de carne': 'Risole de Carne.jpeg',
+  'risoles de gorgonzola': 'Risole de Napolitano.jpeg',
+  'risoles de milho': 'Risole de MIlho.jpeg',
+  'risoles de presunto e queijo': 'Risole de Napolitano.jpeg',
 
   // Salgados Assados
+  'empadas de bacalhau': 'emp.frango.webp', // fallback
+  'empadas de camarão': 'emp.camarao.webp',
   'empadas de frango': 'emp.frango.webp',
-  'empadas de palmito': 'emp.frango.webp',
-  'empadas de bacalhau': 'emp.frango.webp',
-  'empadas de camarão': 'emp.frango.webp',
-  'empadas de queijo': 'Quiche alho, bacon, tomate, queijo.jpeg',
-  'quiche de alho poró': 'Quiche alho, bacon, tomate, queijo.jpeg',
-  'quiche de bacon': 'Quiche alho, bacon, tomate, queijo.jpeg',
-  'quiche de tomate seco': 'Quiche alho, bacon, tomate, queijo.jpeg',
-  'quiche de ricota': 'Quiche alho, bacon, tomate, queijo.jpeg',
-  'enrol. de queijo': 'enr.queijo.webp',
-  'enrol. de salsicha': 'enr.salsicha.webp',
-  'pastel de forno – carne': 'Pasteldecarne.ricota.frango.webp',
-  'pastel de forno – frango': 'Pasteldecarne.ricota.frango.webp',
-  'pastel de forno - ricota/espinafre': 'Pasteldecarne.ricota.frango.webp',
+  'empadas de palmito': 'emp.frango.webp', // fallback
+  'empadas de queijo': 'emp.frango.webp', // fallback
+  'enroladinho de queijo': 'enr.queijo.webp',
+  'enroladinho de salsicha': 'enr.salsicha.webp',
+  'pastel de forno - ricota/espinafre': 'Pasteldericota.webp',
+  'pastel de forno – carne': 'Pasteldefrango.webp',
+  'pastel de forno – frango': 'Pasteldefrango.webp',
+  'quiche de alho poró': 'Quichealho.jpeg',
+  'quiche de bacon': 'Quichebacon.jpeg',
+  'quiche de ricota': 'Quichequeijo.jpeg',
+  'quiche de tomate seco': 'Quichetomate.jpeg',
 
   // Doces Comuns
-  'churros': 'Doce-comum-Churros.webp',
-  'leite ninho': 'Doce-comum-Leite-Ninho.webp',
-  'olho de sogra': 'Doce-comum-Olho-de-sogra.webp',
   'brigadeiro branco': 'Docecomum-BrigadeiroBranco.webp',
   'brigadeiro preto': 'Docecomum-BrigadeiroPreto.webp',
   'cajuzinho': 'Docecomum-Cajuzinhho.webp',
+  'churros': 'Doce-comum-Churros.webp',
+  'leite ninho': 'Doce-comum-Leite-Ninho.webp',
+  'olho de sogra': 'Doce-comum-Olho-de-sogra.webp',
   'ouriço (brigadeiro branco na castanha de caju)': 'Docecomum-Ourico.webp',
   'surpresa de uva': 'Docecomum-Surpresadeuva.webp',
-
+  
   // Bombons
   'morango': 'Bombons-BombomdeMorango.webp'
 };
@@ -265,20 +276,17 @@ const GRUPO_PARA_PASTA = {
   bolos:    './Doces/'
 };
 
-// Aplica a normalização dinâmica em lote no array de produtos
+// Aplica a lógica em lote
 PRODUTOS.forEach(produto => {
   const nomeChave = produto.name.toLowerCase().trim();
   const grupo = produto.category || 'salgados';
   const pasta = GRUPO_PARA_PASTA[grupo] || './Salgados/';
 
-  // Verifica se o produto tem uma imagem existente mapeada
   if (MAPA_IMAGENS_EXISTENTES[nomeChave]) {
     produto.image = `${pasta}${MAPA_IMAGENS_EXISTENTES[nomeChave]}`;
   } else if ((grupo === 'doces' || grupo === 'bombons') && produto.subcategory === 'comuns') {
-    // Fallback específico: só doces da subcategoria 'comuns' recebem a imagem genérica
     produto.image = './Doces/Doce-comum-Doces-diversos.webp';
   } else {
-    // Para os demais (sem mapa e sem fallback), gera caminho normalizado
     produto.image = `${pasta}${normalizarNomeImagem(produto.name)}.webp`;
   }
 });

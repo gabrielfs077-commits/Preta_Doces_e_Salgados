@@ -961,12 +961,14 @@ a {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  padding: 8px 12px;
+  padding: 10px 12px;
   box-sizing: border-box;
-  background: transparent;
-  border-bottom: 1px solid #eee;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
   overflow: hidden;
   align-items: center;
+  margin-bottom: 8px;
 }
 
 /* ── Coluna 1: Imagem — 60px fixos, nunca encolhe nem cresce ── */
@@ -991,7 +993,7 @@ a {
 /* ── Coluna 2: Textos — minmax(0, 1fr), nunca vaza ── */
 .produto-card__center {
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -1003,11 +1005,9 @@ a {
   font-weight: 700;
   color: var(--cor-texto);
   line-height: 1.25;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  max-width: 100%;
+  white-space: normal;
+  overflow: visible;
+  word-break: break-word;
 }
 
 .produto-card__preco {
@@ -1016,8 +1016,6 @@ a {
   font-weight: 700;
   color: var(--cor-verde);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .produto-card__preco span {
@@ -1061,10 +1059,10 @@ a {
 }
 
 .btn-quantidade {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 /* ── Botão "Adicionar" (Miniatura em linha) ── */
@@ -1072,19 +1070,96 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: 6px;
   background: var(--cor-primaria);
   color: white;
   border: none;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 16px;
   transition: transform 0.2s;
 }
 
 .btn-add-mini:active {
   transform: scale(0.9);
+}
+
+/* ── Layout EMPILHADO no mobile estreito ── */
+@media (max-width: 480px) {
+  .produto-card {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "img info"
+      "acoes acoes";
+    gap: 8px 10px;
+    padding: 10px 12px;
+    align-items: start;
+  }
+
+  .produto-card__left {
+    grid-area: img;
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+  }
+
+  .produto-card__img {
+    width: 64px;
+    height: 64px;
+  }
+
+  .produto-card__center {
+    grid-area: info;
+    overflow: visible;
+    align-self: center;
+  }
+
+  .produto-card__nome {
+    font-size: 14px;
+    -webkit-line-clamp: unset;
+    display: block;
+    white-space: normal;
+    overflow: visible;
+  }
+
+  .produto-card__preco {
+    font-size: 14px;
+    white-space: normal;
+  }
+
+  .produto-card__right {
+    grid-area: acoes;
+    margin-left: 0;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 4px 0 0;
+  }
+
+  .quantidade-controle {
+    gap: 6px;
+    padding: 4px 8px;
+  }
+
+  .btn-quantidade {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .quantidade-display {
+    font-size: 15px;
+    min-width: 1.5rem;
+  }
+
+  .btn-add-mini {
+    width: 44px;
+    height: 36px;
+    border-radius: 8px;
+    font-size: 18px;
+  }
 }
 
 /* Sidebar do carrinho (no menu) — Oculta no mobile */
@@ -2766,4 +2841,40 @@ body.tem-carrinho {
   background:
     linear-gradient(white, white) padding-box,
     linear-gradient(135deg, #f09433, #dc2743, #bc1888) border-box;
+}
+
+/* =========================================================
+   BOTÃO LIMPAR CARRINHO — à esquerda para evitar cliques
+   acidentais durante rolagem com o polegar direito
+   ========================================================= */
+.cart-page__limpar-area {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0.5rem 0 1rem;
+}
+
+.cart-page__limpar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  color: var(--cor-vermelho, #e53935);
+  border: 1.5px solid var(--cor-vermelho, #e53935);
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-family: var(--fonte-corpo);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 40px;
+  transition: background 0.2s, color 0.2s;
+  align-self: flex-start;
+}
+
+.cart-page__limpar-btn:active {
+  background: rgba(229, 57, 53, 0.08);
+}
+
+.cart-page__limpar-icone {
+  font-size: 1rem;
 }

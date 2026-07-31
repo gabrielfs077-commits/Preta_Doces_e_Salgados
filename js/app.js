@@ -406,26 +406,28 @@ function gerarMensagemWhatsApp(nome, data, horario) {
   });
 
   Object.keys(grupos).forEach(grupoNome => {
+    // Cabeçalho da categoria com linha em branco abaixo
     msg += `       ${grupoNome}\n\n`;
 
+    // Itens da categoria em linhas consecutivas, sem linha em branco entre eles
     grupos[grupoNome].forEach(item => {
       msg += `${item.quantidade} ${item.name.toLowerCase()}\n`;
       if (item.description) {
         msg += `  ${item.description}\n`;
       }
-
-      // Se for bolo com topo personalizado
       if (item.topoPersonalizado) {
         msg += `  [Topo de Bolo Personalizado: A combinar modelo/valor]\n`;
       }
-      msg += '\n';
     });
+
+    // Linha em branco apenas após o último item da categoria (antes da próxima)
+    msg += '\n';
   });
 
   const total = calcularTotal(appState.carrinho);
   const totalFormatado = total.toFixed(2).replace('.', ',');
 
-  msg += `Total: ${totalFormatado} reais\n\n`;
+  msg += `*Total: ${totalFormatado} reais*\n\n`;
   msg += 'Espero seu retorno para finalizar o pedido.';
 
   return encodeURIComponent(msg);
@@ -800,6 +802,7 @@ function onDocClick(e) {
   // Limpar Carrinho
   if (e.target.closest('[data-acao="limpar-carrinho"]')) {
     e.preventDefault();
+    if (!confirm('Tem certeza que deseja esvaziar o carrinho?')) return;
     appState.carrinho = [];
     appState.quantidades = {};
     salvarEstado();
