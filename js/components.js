@@ -274,7 +274,7 @@ function renderHomePage() {
 function renderProdutoCard(produto, quantidade) {
   const step = produto.unit === 'cento' ? 25 : 1;
   const min  = produto.unit === 'cento' ? 25 : 1;
-  const unidadeLabel = produto.unit === 'cento' ? `/ cento (por 100un)` : `/ unidade`;
+  const unidadeLabel = produto.unit === 'cento' ? `/ cento (por 100un)` : produto.unit === 'kg' ? `/ kg` : `/ unidade`;
 
   const precoFormatado = formatarMoeda(produto.price);
   // Top 5: badge dinâmico (Top 1, Top 2, etc). Destaque: tag sutil "Popular"
@@ -506,6 +506,21 @@ function renderMenuPage(abaAtiva, subAbaAtiva, carrinho, quantidades, boloPerson
 
   for (const grupo of gruposParaRenderizar) {
     if (grupo === 'bolos') {
+      const produtosBolo = PRODUTOS.filter(p => p.category === 'bolos');
+      if (produtosBolo.length > 0) {
+        const cardsHTML = produtosBolo.map(p => {
+          const qtd = obterQuantidadeExibicao(p);
+          return renderProdutoCard(p, qtd);
+        }).join('');
+
+        secoesHTML += `
+          <section class="secao-produto" id="secao-bolos">
+            <h2 class="secao-produto__titulo">Tipos de bolo</h2>
+            <div class="produtos-grid">${cardsHTML}</div>
+          </section>
+        `;
+      }
+
       secoesHTML += renderBoloPersonalizado(boloPersonalizado);
       continue;
     }

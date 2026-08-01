@@ -53,7 +53,7 @@ const PRODUTOS = [
   { id: 1,  name: 'Alho Poró \u2013 Creme Cheese',             price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'folhados', rankVendido: 'top5', ranking: 3 },
   { id: 2,  name: 'Bacalhau',                               price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'folhados' },
   { id: 3,  name: 'Banana com Queijo',                      price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'folhados' },
-  { id: 4,  name: 'Camarão',                                 price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'folhados' },
+  { id: 4,  name: 'Camarão',                                 price: 150.00, unit: 'cento', category: 'salgados', subcategory: 'folhados' },
   { id: 5,  name: 'Carne de Sol',                           price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'folhados' },
   { id: 6,  name: 'Castanha do Par\u00e1',                       price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'folhados', rankVendido: 'top5', ranking: 1 },
   { id: 7,  name: 'Fil\u00e9',                                   price: 94.00,  unit: 'cento', category: 'salgados', subcategory: 'folhados', rankVendido: 'destaque' },
@@ -81,13 +81,13 @@ const PRODUTOS = [
   { id: 27, name: 'Risoles de Gorgonzola',                  price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
   { id: 28, name: 'Risoles de Presunto e Queijo',           price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
   { id: 29, name: 'Risoles de Bacalhau',                    price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
-  { id: 30, name: 'Risoles de Camarão',                      price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
+  { id: 30, name: 'Risoles de Camarão',                      price: 150.00, unit: 'cento', category: 'salgados', subcategory: 'fritos' },
   { id: 31, name: 'Risoles de Carne',                       price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos' },
   { id: 32, name: 'Risoles de Milho',                       price: 70.00,  unit: 'cento', category: 'salgados', subcategory: 'fritos',   rankVendido: 'destaque' },
 
   // --- SALGADOS ASSADOS ---
   { id: 33, name: 'Empadas de Bacalhau',                    price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
-  { id: 34, name: 'Empadas de Camarão',                       price: 90.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
+  { id: 34, name: 'Empadas de Camarão',                       price: 150.00, unit: 'cento', category: 'salgados', subcategory: 'assados' },
   { id: 35, name: 'Empadas de Frango',                      price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados',  rankVendido: 'top5', ranking: 2 },
   { id: 36, name: 'Empadas de Palmito',                     price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
   { id: 37, name: 'Empadas de Queijo',                      price: 76.00,  unit: 'cento', category: 'salgados', subcategory: 'assados' },
@@ -150,6 +150,13 @@ const PRODUTOS = [
   { id: 83, name: 'Trufa Tradicional',                      price: 400.00, unit: 'cento', category: 'doces', subcategory: 'gourmet' },
   { id: 84, name: 'Trufas de Lim\u00e3o',                         price: 400.00, unit: 'cento', category: 'doces', subcategory: 'gourmet' },
   { id: 85, name: 'Trufas de Maracuj\u00e1',                       price: 400.00, unit: 'cento', category: 'doces', subcategory: 'gourmet' },
+
+  // --- BOLOS ---
+  { id: 103, name: 'Bolo de Chocolate',                price: 115.00, unit: 'kg', category: 'bolos', subcategory: 'tradicionais' },
+  { id: 104, name: 'Bolo de Cenoura',                  price: 115.00, unit: 'kg', category: 'bolos', subcategory: 'tradicionais' },
+  { id: 105, name: 'Bolo Red Velvet',                  price: 135.00, unit: 'kg', category: 'bolos', subcategory: 'especiais' },
+  { id: 106, name: 'Bolo de Churros',                  price: 135.00, unit: 'kg', category: 'bolos', subcategory: 'especiais' },
+  { id: 107, name: 'Bolo de Ninho com Nutella',        price: 145.00, unit: 'kg', category: 'bolos', subcategory: 'especiais' },
 
   // --- BOMBONS ---
   { id: 86, name: 'Ameixa',           price: 270.00, unit: 'cento', category: 'bombons', subcategory: '' },
