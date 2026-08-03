@@ -181,11 +181,12 @@ const OPCOES_BOLO = {
   PESO_MINIMO: 1.5,
   PRECO_CAIXA: 20.00,
   SABORES_MASSA: [
-    'Chocolate (Nega Maluca)',
-    'Baunilha / Pão de Ló',
-    'Red Velvet',
-    'Cenoura',
-    'Churros'
+    'Amanteigada',
+    'Baunilha',
+    'Branca',
+    'Chocolate',
+    'Chocolate Black',
+    'Red Velvet'
   ],
   COBERTURAS_RECHEIOS: [
     'Brigadeiro Gourmet',
