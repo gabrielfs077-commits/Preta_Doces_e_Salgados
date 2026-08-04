@@ -1,0 +1,1351 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Sistema de Pedidos - Cozinha | Preta Doces e Salgados</title>
+  <meta name="description" content="Ferramenta interna de retaguarda para a cozinha." />
+
+  <!-- Favicon -->
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>" />
+
+  <!-- Google Fonts — fonte legível e grande -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===========================
+       RESET E VARIÁVEIS GLOBAIS
+       =========================== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      /* Paleta de alto contraste */
+      --cor-fundo: #1a1a2e;
+      --cor-fundo-card: #16213e;
+      --cor-fundo-input: #0f3460;
+      --cor-texto: #f0f0f0;
+      --cor-texto-suave: #b0b0c8;
+      --cor-primaria: #e94560;
+      --cor-primaria-hover: #ff6b81;
+      --cor-sucesso: #2ecc71;
+      --cor-sucesso-hover: #27ae60;
+      --cor-aviso: #f39c12;
+      --cor-erro: #e74c3c;
+      --cor-borda: #2a2a4a;
+      --cor-fundo-resultado: #0a0a1a;
+
+      /* Tipografia */
+      --fonte: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --tamanho-base: 18px;
+      --tamanho-titulo: 28px;
+      --tamanho-subtitulo: 22px;
+      --tamanho-grande: 20px;
+      --tamanho-botao: 20px;
+
+      /* Espaçamento */
+      --espaco-sm: 8px;
+      --espaco-md: 16px;
+      --espaco-lg: 24px;
+      --espaco-xl: 32px;
+
+      /* Bordas */
+      --raio: 12px;
+    }
+
+    html {
+      font-size: var(--tamanho-base);
+    }
+
+    body {
+      font-family: var(--fonte);
+      background-color: var(--cor-fundo);
+      color: var(--cor-texto);
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===========================
+       LAYOUT PRINCIPAL
+       =========================== */
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: var(--espaco-md);
+      padding-bottom: 80px;
+    }
+
+    /* ===========================
+       CABEÇALHO
+       =========================== */
+    .cabecalho {
+      text-align: center;
+      padding: var(--espaco-lg) 0;
+      border-bottom: 2px solid var(--cor-borda);
+      margin-bottom: var(--espaco-lg);
+    }
+
+    .cabecalho__icone {
+      font-size: 48px;
+      display: block;
+      margin-bottom: var(--espaco-sm);
+    }
+
+    .cabecalho__titulo {
+      font-size: var(--tamanho-titulo);
+      font-weight: 800;
+      color: var(--cor-texto);
+      letter-spacing: -0.5px;
+    }
+
+    .cabecalho__subtitulo {
+      font-size: 15px;
+      color: var(--cor-texto-suave);
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    /* ===========================
+       SEÇÕES (CARDS)
+       =========================== */
+    .secao {
+      background: var(--cor-fundo-card);
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio);
+      padding: var(--espaco-lg);
+      margin-bottom: var(--espaco-lg);
+    }
+
+    .secao__titulo {
+      font-size: var(--tamanho-subtitulo);
+      font-weight: 700;
+      margin-bottom: var(--espaco-md);
+      display: flex;
+      align-items: center;
+      gap: var(--espaco-sm);
+    }
+
+    /* ===========================
+       CAMPOS DE INFORMAÇÃO DO CLIENTE
+       =========================== */
+    .campo-grupo {
+      margin-bottom: var(--espaco-md);
+    }
+
+    .campo-grupo:last-child {
+      margin-bottom: 0;
+    }
+
+    .campo-grupo label {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--cor-texto-suave);
+      margin-bottom: 6px;
+    }
+
+    .campo-grupo input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: var(--tamanho-base);
+      font-family: var(--fonte);
+      background: var(--cor-fundo-input);
+      color: var(--cor-texto);
+      border: 2px solid var(--cor-borda);
+      border-radius: var(--raio);
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .campo-grupo input:focus {
+      border-color: var(--cor-primaria);
+    }
+
+    .campo-grupo input::placeholder {
+      color: #666;
+    }
+
+    /* Layout 2 colunas no desktop */
+    .campos-linha {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--espaco-md);
+    }
+
+    @media (max-width: 480px) {
+      .campos-linha {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ===========================
+       TEXTAREA
+       =========================== */
+    .textarea-pedido {
+      width: 100%;
+      min-height: 220px;
+      padding: 16px;
+      font-size: var(--tamanho-base);
+      font-family: var(--fonte);
+      line-height: 1.7;
+      background: var(--cor-fundo-input);
+      color: var(--cor-texto);
+      border: 2px solid var(--cor-borda);
+      border-radius: var(--raio);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .textarea-pedido:focus {
+      border-color: var(--cor-primaria);
+    }
+
+    .textarea-pedido::placeholder {
+      color: #666;
+      font-size: 17px;
+    }
+
+    /* ===========================
+       BOTÕES
+       =========================== */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--espaco-sm);
+      width: 100%;
+      padding: 18px 24px;
+      font-size: var(--tamanho-botao);
+      font-weight: 700;
+      font-family: var(--fonte);
+      border: none;
+      border-radius: var(--raio);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn--primario {
+      background: var(--cor-primaria);
+      color: #fff;
+      margin-top: var(--espaco-md);
+    }
+
+    .btn--primario:hover {
+      background: var(--cor-primaria-hover);
+    }
+
+    .btn--sucesso {
+      background: var(--cor-sucesso);
+      color: #fff;
+    }
+
+    .btn--sucesso:hover {
+      background: var(--cor-sucesso-hover);
+    }
+
+    .btn--secundario {
+      background: transparent;
+      color: var(--cor-texto-suave);
+      border: 2px solid var(--cor-borda);
+      font-size: 16px;
+      padding: 14px 20px;
+    }
+
+    .btn--secundario:hover {
+      border-color: var(--cor-texto-suave);
+      color: var(--cor-texto);
+    }
+
+    .btn-grupo {
+      display: flex;
+      gap: var(--espaco-md);
+      margin-top: var(--espaco-md);
+    }
+
+    .btn-grupo .btn {
+      margin-top: 0;
+    }
+
+    /* ===========================
+       RESULTADO / COMANDA
+       =========================== */
+    .resultado {
+      display: none;
+    }
+
+    .resultado.visivel {
+      display: block;
+    }
+
+    .comanda-saida {
+      width: 100%;
+      min-height: 300px;
+      padding: 20px;
+      font-size: 17px;
+      font-family: 'Courier New', Courier, monospace;
+      line-height: 1.8;
+      background: var(--cor-fundo-resultado);
+      color: #e0e0e0;
+      border: 2px solid var(--cor-borda);
+      border-radius: var(--raio);
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-y: auto;
+      resize: none;
+    }
+
+    /* ===========================
+       FEEDBACK / STATUS
+       =========================== */
+    .feedback {
+      display: none;
+      padding: 14px 18px;
+      border-radius: var(--raio);
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: var(--espaco-md);
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .feedback.visivel {
+      display: block;
+    }
+
+    .feedback--sucesso {
+      background: rgba(46, 204, 113, 0.15);
+      color: var(--cor-sucesso);
+      border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .feedback--aviso {
+      background: rgba(243, 156, 18, 0.15);
+      color: var(--cor-aviso);
+      border: 1px solid rgba(243, 156, 18, 0.3);
+    }
+
+    .feedback--erro {
+      background: rgba(231, 76, 60, 0.15);
+      color: var(--cor-erro);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+
+    /* Lista de não reconhecidos */
+    .lista-alertas {
+      margin-top: var(--espaco-sm);
+      padding-left: 20px;
+      text-align: left;
+    }
+
+    .lista-alertas li {
+      margin-bottom: 4px;
+      font-weight: 400;
+      font-size: 15px;
+    }
+
+    /* ===========================
+       SEÇÃO DE INSTRUÇÕES
+       =========================== */
+    .instrucoes {
+      background: rgba(233, 69, 96, 0.08);
+      border: 1px solid rgba(233, 69, 96, 0.2);
+      border-radius: var(--raio);
+      padding: var(--espaco-lg);
+      margin-bottom: var(--espaco-lg);
+    }
+
+    .instrucoes__titulo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--cor-primaria);
+      margin-bottom: var(--espaco-sm);
+    }
+
+    .instrucoes p,
+    .instrucoes li {
+      font-size: 15px;
+      color: var(--cor-texto-suave);
+      line-height: 1.6;
+    }
+
+    .instrucoes ul {
+      padding-left: 20px;
+      margin-top: var(--espaco-sm);
+    }
+
+    .instrucoes li {
+      margin-bottom: 4px;
+    }
+
+    .instrucoes code {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 14px;
+      color: var(--cor-primaria-hover);
+    }
+
+    /* ===========================
+       ANIMAÇÕES
+       =========================== */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ===========================
+       RESPONSIVIDADE
+       =========================== */
+    @media (max-width: 480px) {
+      :root {
+        --tamanho-base: 17px;
+        --tamanho-titulo: 24px;
+        --tamanho-subtitulo: 20px;
+      }
+
+      .container {
+        padding: var(--espaco-sm) 12px;
+        padding-bottom: 60px;
+      }
+
+      .secao {
+        padding: var(--espaco-md);
+      }
+
+      .textarea-pedido {
+        min-height: 180px;
+      }
+
+      .btn {
+        padding: 16px 20px;
+      }
+
+      .btn-grupo {
+        flex-direction: column;
+      }
+    }
+
+    /* Acessibilidade: foco visível */
+    :focus-visible {
+      outline: 3px solid var(--cor-primaria);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- CABEÇALHO -->
+    <header class="cabecalho">
+      <span class="cabecalho__icone" aria-hidden="true">📋</span>
+      <h1 class="cabecalho__titulo">Sistema de Pedidos - Cozinha</h1>
+      <p class="cabecalho__subtitulo">Preta Doces e Salgados</p>
+    </header>
+
+    <!-- INSTRUÇÕES DE USO -->
+    <div class="instrucoes" id="instrucoes-uso">
+      <p class="instrucoes__titulo">📖 Como usar</p>
+      <p>Cole o texto do pedido do cliente e clique em "Calcular Pedido".</p>
+      <ul>
+        <li>O formato aceito é: <code>100 Coxinha Comum</code></li>
+        <li>A quantidade deve vir antes do nome do produto</li>
+        <li>Use uma linha para cada produto</li>
+        <li>Palavras como "cento", "un", "kg" são ignoradas automaticamente</li>
+      </ul>
+    </div>
+
+
+
+    <!-- ÁREA DE ENTRADA DO PEDIDO -->
+    <section class="secao" id="secao-pedido">
+      <h2 class="secao__titulo">📝 Pedido</h2>
+      <textarea
+        id="texto-pedido"
+        class="textarea-pedido"
+        placeholder="Cole o texto do pedido do cliente aqui...
+
+Exemplo:
+100 Coxinha Comum
+100 Kibe
+50 Empadas de Frango
+100 Brigadeiro Preto"
+        spellcheck="false"
+        autocomplete="off"
+      ></textarea>
+      <button type="button" class="btn btn--primario" id="btn-calcular" onclick="calcularPedido()">
+        🔍 Calcular Pedido
+      </button>
+    </section>
+
+    <!-- FEEDBACK -->
+    <div id="feedback" class="feedback" role="alert" aria-live="polite"></div>
+
+    <!-- RESULTADO / COMANDA -->
+    <section class="secao resultado" id="secao-resultado">
+      <h2 class="secao__titulo">📄 Comanda Gerada</h2>
+      <div id="comanda-saida" class="comanda-saida" tabindex="0" aria-label="Texto da comanda gerada"></div>
+      <div class="btn-grupo">
+        <button type="button" class="btn btn--sucesso" id="btn-copiar" onclick="copiarComanda()">
+          📋 Copiar Comanda
+        </button>
+        <button type="button" class="btn btn--secundario" id="btn-limpar" onclick="limparTudo()">
+          🗑️ Limpar Tudo
+        </button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- CARREGAR DATA.JS PRIMEIRO -->
+  <script src="./js/data.js?v=20260728"></script>
+
+  <!-- LÓGICA DO SISTEMA DE PEDIDOS -->
+  <script>
+    // ===============================================================
+    // DICIONÁRIO "DE-PARA"
+    // Mapeia abreviações e variações para o nome oficial no data.js.
+    // O dono pode expandir este dicionário livremente no futuro.
+    // A CHAVE deve ser em MAIÚSCULAS. O VALOR deve ser exatamente
+    // igual à propriedade "name" do produto no data.js.
+    // ===============================================================
+    const dicionarioDePara = {
+      "AIPIM /CARNE": "Aipim com Carne de Sol",
+      "AIPIM C/ CARNE": "Aipim com Carne de Sol",
+      "AIPIM C/ QUEIJO": "Aipim com Queijo",
+      "AIPIM COM CARNE": "Aipim com Carne de Sol",
+      "AIPIM COM CARNE DE SOL": "Aipim com Carne de Sol",
+      "AIPIM COM QUEIJO": "Aipim com Queijo",
+      "ALHO": "Alho Poró – Creme Cheese",
+      "ALHO PORO": "Alho Poró – Creme Cheese",
+      "ALHO PORÓ": "Alho Poró – Creme Cheese",
+      "B AZEITONA": "Bolinha de Azeitona com Queijo",
+      "B. AZEITONA": "Bolinha de Azeitona com Queijo",
+      "B. CALABRESA": "Bolinha de Calabresa",
+      "B. CALABRUSA": "Bolinha de Calabresa",
+      "B. DE AZEITONA COM QUEIJO": "Bolinha de Azeitona com Queijo",
+      "B. DE CALABRESA": "Bolinha de Calabresa",
+      "B. DE FRANGO": "Coxinha com Catupiry",
+      "B. FRANGO": "Coxinha com Catupiry",
+      "BACALHAU": "Bacalhau",
+      "BAIANINHO": "Baianinho com Coco/Amendoim",
+      "BANANA": "Banana com Queijo",
+      "BANANA COM QUEIJO": "Banana com Queijo",
+      "BARQUETE": "Barquetes (casquinhas)",
+      "BARQUETES": "Barquetes (casquinhas)",
+      "BEIJINHO": "Beijinho de Côco (queimado)",
+      "BEIJINHO C/ SUCRILHOS": "Beijinho de Côco – Cober. de Sucrilhos",
+      "BEIJINHO CARAMELIZADO": "Beijinho de Côco",
+      "BEIJINHO DE COCO": "Beijinho de Côco (queimado)",
+      "BEIJINHO GOURMET": "Beijinho Gourmet",
+      "BICHO DE PE": "Bicho de Pé",
+      "BICHO DE PÉ": "Bicho de Pé",
+      "BICHO PÉ": "Bicho de Pé",
+      "BOLINHA DE FRANGO": "Coxinha com Catupiry",
+      "BOMBOM AMEIXA": "Ameixa",
+      "BOMBOM BRIG. BRANCO": "Brigadeiro Branco",
+      "BOMBOM BRIG. LIMAO": "Brigadeiro de Limão",
+      "BOMBOM BRIGADEIRO": "Brigadeiro Preto",
+      "BOMBOM CASADINHO": "Casadinho",
+      "BOMBOM CASTANHA": "Castanha do Pará",
+      "BOMBOM CEREJA": "Cereja",
+      "BOMBOM COCO": "Côco",
+      "BOMBOM DAMASCO": "Damasco",
+      "BOMBOM DE MARACUJÁ": "Maracujá",
+      "BOMBOM DE UVA": "Uva",
+      "BOMBOM MARACUJA": "Maracujá",
+      "BOMBOM MORANGO": "Morango",
+      "BOMBOM NOZES": "Nozes",
+      "BOMBOM PISTACHE": "Pistache",
+      "BOMBOM UVA": "Uva",
+      "BRIG": "Brigadeiro Preto",
+      "BRIG BRANCO": "Brigadeiro Branco",
+      "BRIG BRANCO UVA": "Surpresa de Uva",
+      "BRIG DE LIMAO": "Brigadeiro de Limão",
+      "BRIG DE LIMÃO": "Brigadeiro de Limão",
+      "BRIG LIMAO": "Brigadeiro de Limão",
+      "BRIG MARACUJA": "Brigadeiro de Maracujá",
+      "BRIG MARACUJÁ": "Brigadeiro de Maracujá",
+      "BRIG PRETO": "Brigadeiro Preto",
+      "BRIG PRETO GOURMET": "Brigadeiro Gourmet",
+      "BRIG. BRANCO": "Brigadeiro Branco",
+      "BRIG. PRETO": "Brigadeiro Preto",
+      "BRIG. PRITO": "Brigadeiro Preto",
+      "BRIGADEIRO": "Brigadeiro Preto",
+      "BRIGADEIRO BRANCO": "Brigadeiro Branco",
+      "BRIGADEIRO CARAMELIZADO": "Brigadeiro Preto",
+      "BRIGADEIRO DE LIMAO": "Brigadeiro de Limão",
+      "BRIGADEIRO DE MARACUJA": "Brigadeiro de Maracujá",
+      "BRIGADEIRO GOURMET": "Brigadeiro Gourmet",
+      "BRIGADEIRO LIMAO": "Brigadeiro de Limão",
+      "BRIGADEIRO MARACUJA": "Brigadeiro de Maracujá",
+      "BRIGADEIRO PRETO": "Brigadeiro Preto",
+      "CACHORRO QUENTE": "Cachorro Quente",
+      "CAJUZINHO": "Cajuzinho",
+      "CAJUZINHOS": "Cajuzinho",
+      "CAMAFEU DE NOZES": "Camafeu de Nozes",
+      "CAMARAO": "Camarão",
+      "CAMARÃO": "Camarão",
+      "CARNE DE SOL": "Carne de Sol",
+      "CARNE SOL": "Carne de Sol",
+      "CASADINHO": "Casadinho",
+      "CASADINHOS": "Casadinho",
+      "CASQUINHA CHOCOLATE": "Casquinha de Chocolate com Cereja",
+      "CASTANHA": "Castanha do Pará",
+      "CASTANHA CARAMELIZADA": "Castanha do Pará",
+      "CASTANHA DO PARA": "Castanha do Pará",
+      "CASTANHA DO PARÁ": "Castanha do Pará",
+      "CASTANHO": "Castanha do Pará",
+      "CASTONHA": "Castanha do Pará",
+      "CHOCOPOWER": "Chocopower Branco ou Preto",
+      "CHURRO": "Churros",
+      "CHURROS": "Churros",
+      "COPINHO CEREJA": "Copinhos de Brigadeiro com Cereja",
+      "COSTANHA": "Castanha do Pará",
+      "COX": "Coxinha Comum",
+      "COX COMUM": "Coxinha Comum",
+      "COX.": "Coxinha Comum",
+      "COX. C/ CATUPIRY": "Coxinha com Catupiry",
+      "COXINHA": "Coxinha Comum",
+      "COXINHA COM CATUPIRY": "Coxinha com Catupiry",
+      "COXINHA COMUM": "Coxinha Comum",
+      "COXINHAS": "Coxinha Comum",
+      "DOCINHO DE DAMASCO": "Docinho de Damasco",
+      "EMP DE FRANGO": "Empadas de Frango",
+      "EMP DE PALMITO": "Empadas de Palmito",
+      "EMP DE QUEIJO": "Empadas de Queijo",
+      "EMP FRANGO": "Empadas de Frango",
+      "EMP PALMITO": "Empadas de Palmito",
+      "EMP QUEIJO": "Empadas de Queijo",
+      "EMP. BACALHAU": "Empadas de Bacalhau",
+      "EMP. CAMARAO": "Empadas de Camarão",
+      "EMP. CAMARÃO": "Empadas de Camarão",
+      "EMP. DE FRANGO": "Empadas de Frango",
+      "EMP. DE QUEIJO": "Empadas de Queijo",
+      "EMP. FRANGO": "Empadas de Frango",
+      "EMP. PALMITO": "Empadas de Palmito",
+      "EMP. QUEIJO": "Empadas de Queijo",
+      "EMPADA DE BACALHAU": "Empadas de Bacalhau",
+      "EMPADA DE CAMARÃO": "Empadas de Camarão",
+      "EMPADA DE FRANGO": "Empadas de Frango",
+      "EMPADA DE PALMITO": "Empadas de Palmito",
+      "EMPADA DE QUEIJO": "Empadas de Queijo",
+      "EMPADAS DE BACALHAU": "Empadas de Bacalhau",
+      "EMPADAS DE CAMARÃO": "Empadas de Camarão",
+      "EMPADAS DE FRANGO": "Empadas de Frango",
+      "EMPADAS DE PALMITO": "Empadas de Palmito",
+      "ENR DE QUEIJO": "Enroladinho de Queijo",
+      "ENR DE SALSICHA": "Enroladinho de Salsicha",
+      "ENR QUEIJO": "Enroladinho de Queijo",
+      "ENR. DE QUEIJO": "Enroladinho de Queijo",
+      "ENR. DE SALSICHA": "Enroladinho de Salsicha",
+      "ENR. QUEIJO": "Enroladinho de Queijo",
+      "ENR. SALSICHA": "Enroladinho de Salsicha",
+      "ENROL DE QUEIJO": "Enroladinho de Queijo",
+      "ENROL DE SALSICHA": "Enroladinho de Salsicha",
+      "ENROLADINHO DE QUEIJO": "Enroladinho de Queijo",
+      "ENROLADINHO DE SALSICHA": "Enroladinho de Salsicha",
+      "ESF. CARNE": "Esfirra Carne",
+      "ESF. DE CARNE": "Esfirra Carne",
+      "ESF. DE RICOTA": "Esfirra de Ricota",
+      "ESF. FRANGO": "Esfirra Frango",
+      "ESF. RICOTA": "Esfirra de Ricota",
+      "ESFIRRA CARNE": "Esfirra Carne",
+      "ESFIRRA DE CARNE": "Esfirra Carne",
+      "ESFIRRA DE FRANGO": "Esfirra Frango",
+      "ESFIRRA DE RICOTA": "Esfirra de Ricota",
+      "ESFIRRA FRANGO": "Esfirra Frango",
+      "ESFIRRAS DE FRANGO": "Esfirra Frango",
+      "F CAMARÃO": "Camarão",
+      "F CARNE SOL": "Carne de Sol",
+      "F FRANGO": "Frango Catupirí",
+      "F PALMITO": "Palmito – Catupirí",
+      "F. ALHO": "Alho Poró – Creme Cheese",
+      "F. BACALHAU": "Bacalhau",
+      "F. BANANA": "Banana com Queijo",
+      "F. CAMARAO": "Camarão",
+      "F. CAMARÃO": "Camarão",
+      "F. CARNE DE SOL": "Carne de Sol",
+      "F. CARNE SOL": "Carne de Sol",
+      "F. CASTANHA": "Castanha do Pará",
+      "F. DE OVOS": "Fio de Ovos com Bacon",
+      "F. FILÉ": "Filé",
+      "F. FIO DE OVOS": "Fio de Ovos com Bacon",
+      "F. FRANGO": "Frango Catupirí",
+      "F. MACA": "Maçã",
+      "F. OVOS": "Fio de Ovos com Bacon",
+      "F. PALMITO": "Palmito – Catupirí",
+      "F. PERU": "Peito de Peru com Abacaxi",
+      "F. RICOTA": "Ricota com Espinafre e Catupiry",
+      "F. ROMEU": "Romeu e Julieta",
+      "F. TOMATE": "Tomate Seco – Queijo",
+      "FILE": "Filé",
+      "FILÉ": "Filé",
+      "FIO DE OVOS": "Fio de Ovos com Bacon",
+      "FIOS DE OVOS": "Fio de Ovos com Bacon",
+      "FIOS OVOS": "Fio de Ovos com Bacon",
+      "FOLHADO DE ALHO PORO": "Alho Poró – Creme Cheese",
+      "FOLHADO DE ALHO PORÓ": "Alho Poró – Creme Cheese",
+      "FOLHADO DE BANANA": "Banana com Queijo",
+      "FOLHADO DE CARNE DE SOL": "Carne de Sol",
+      "FOLHADO DE CASTANHA": "Castanha do Pará",
+      "FOLHADO DE CASTONHA": "Castanha do Pará",
+      "FOLHADO DE FIO DE OVOS": "Fio de Ovos com Bacon",
+      "FOLHADO DE FRANGO": "Frango Catupirí",
+      "FOLHADO DE PEITO DE PERU": "Peito de Peru com Abacaxi",
+      "FOLHADOS DE FIO DE OVOS": "Fio de Ovos com Bacon",
+      "FOLHEADO DE CASTANHA": "Castanha do Pará",
+      "FRANGO": "Frango Catupirí",
+      "FRANGO COM CATUPIRY": "Coxinha com Catupiry",
+      "FRUTINHAS CARAMELIZADAS": "Frutinhas",
+      "KIBE": "Kibe",
+      "KIBE C/ QUEIJO": "Kibe com Queijo",
+      "KIBE COM QUEIJO": "Kibe com Queijo",
+      "KIBES": "Kibe",
+      "KIBES C/ QUEIJO": "Kibe com Queijo",
+      "KIBES COM QUEJO": "Kibe com Queijo",
+      "LEITE NINHO": "Leite Ninho",
+      "LEITE NINHO GOURMET": "Docinho de Leite Ninho Gourmet (Brigadeiro, Goiabada, Nutella)",
+      "M DE MILHO": "Maravilha de Milho com Bacon",
+      "M DE QUEIJO": "Maravilha de Queijo",
+      "M QUEIJO": "Maravilha de Queijo",
+      "M. DE MILHO": "Maravilha de Milho com Bacon",
+      "M. DE QUEIJO": "Maravilha de Queijo",
+      "M. MILHO": "Maravilha de Milho com Bacon",
+      "M. QUEIJO": "Maravilha de Queijo",
+      "M. QUEJO": "Maravilha de Queijo",
+      "MAR. DE MILHO": "Maravilha de Milho com Bacon",
+      "MAR. DE MILHO COM BACON": "Maravilha de Milho com Bacon",
+      "MAR. MILHO": "Maravilha de Milho com Bacon",
+      "MAR. MILHO COM BACON": "Maravilha de Milho com Bacon",
+      "MAR. QUEIJO": "Maravilha de Queijo",
+      "MARAVILHA / MILHO": "Maravilha de Milho com Bacon",
+      "MARAVILHA DE MILHO": "Maravilha de Milho com Bacon",
+      "MARAVILHA DE QUEIJO": "Maravilha de Queijo",
+      "MARAVILHA DE QUEJO": "Maravilha de Queijo",
+      "MARAVILHAS DE QUEIJO": "Maravilha de Queijo",
+      "MAÇÃ": "Maçã",
+      "MINI HAMBURGUER": "Mini Hamburguer",
+      "MINI PIZZA": "Mini Pizza",
+      "NAPOLITANO": "Risoles de Presunto e Queijo",
+      "NOZES CARAMELIZADAS": "Nozes",
+      "OLHO DE SOGRA": "Olho de Sogra",
+      "OLHO DE SOGRA CARAMELIZADO": "Olho de Sogra",
+      "OLHOS DE SOGRA": "Olho de Sogra",
+      "OURICO": "Ouriço (brigadeiro branco na castanha de caju)",
+      "OURIÇO": "Ouriço (brigadeiro branco na castanha de caju)",
+      "P. CARNE": "Pastel de Forno – Carne",
+      "P. DE CARNE": "Pastel de Forno – Carne",
+      "P. DE FRANGO": "Pastel de Forno – Frango",
+      "P. DE RICOTA": "Pastel de Forno - Ricota/Espinafre",
+      "P. FRANGO": "Pastel de Forno – Frango",
+      "P. RICOTA": "Pastel de Forno - Ricota/Espinafre",
+      "PALMITO": "Palmito – Catupirí",
+      "PASTEL DE CARNE": "Pastel de Forno – Carne",
+      "PASTEL DE FORNO CARNE": "Pastel de Forno – Carne",
+      "PASTEL DE FORNO DE CARNE": "Pastel de Forno – Carne",
+      "PASTEL DE FRANGO": "Pastel de Forno – Frango",
+      "PASTEL DE RICOTA": "Pastel de Forno - Ricota/Espinafre",
+      "PASTEL RICOTA": "Pastel de Forno - Ricota/Espinafre",
+      "PEITO DE PERU": "Peito de Peru com Abacaxi",
+      "PEROLA": "Pérola de Queijo",
+      "PEROLA DE QUEIJO": "Pérola de Queijo",
+      "PERU": "Peito de Peru com Abacaxi",
+      "PÉROLA DE QUEIJO": "Pérola de Queijo",
+      "PÉROLA DE QUEJO": "Pérola de Queijo",
+      "QUIBE": "Kibe",
+      "QUICHE ALHO": "Quiche de Alho Poró",
+      "QUICHE DE ALHO": "Quiche de Alho Poró",
+      "QUICHE DE RICOTA": "Quiche de Ricota",
+      "QUICHE DE TOMATE": "Quiche de Tomate Seco",
+      "QUICHES DE BACON": "Quiche de Bacon",
+      "RICOTA": "Ricota com Espinafre e Catupiry",
+      "RIS DE CARNE": "Risoles de Carne",
+      "RIS DE GORGONZOLA": "Risoles de Gorgonzola",
+      "RIS DE MILHO": "Risoles de Milho",
+      "RIS DE NAPOLITANO": "Risoles de Presunto e Queijo",
+      "RIS GORGONZOLA": "Risoles de Gorgonzola",
+      "RIS MILHO": "Risoles de Milho",
+      "RIS NAPOLITANO": "Risoles de Presunto e Queijo",
+      "RIS. BACALHAU": "Risoles de Bacalhau",
+      "RIS. CAMARAO": "Risoles de Camarão",
+      "RIS. CARNE": "Risoles de Carne",
+      "RIS. DE MILHO": "Risoles de Milho",
+      "RIS. GORGONZOLA": "Risoles de Gorgonzola",
+      "RIS. MILHO": "Risoles de Milho",
+      "RIS. NAPOLITANO": "Risoles de Presunto e Queijo",
+      "RIS. PRESUNTO": "Risoles de Presunto e Queijo",
+      "RISOLE DE BACALHAU": "Risoles de Bacalhau",
+      "RISOLE DE CAMARÃO": "Risoles de Camarão",
+      "RISOLE DE CARNE": "Risoles de Carne",
+      "RISOLE DE GORGONZOLA": "Risoles de Gorgonzola",
+      "RISOLE DE MILHO": "Risoles de Milho",
+      "RISOLE DE PRESUNTO E QUEIJO": "Risoles de Presunto e Queijo",
+      "RISOLE GORGONZOLA": "Risoles de Gorgonzola",
+      "RISOLE MILHO": "Risoles de Milho",
+      "RISOLE NAPOLITANO": "Risoles de Presunto e Queijo",
+      "RISOLE QUEIJO E PRESUNTO": "Risoles de Presunto e Queijo",
+      "RISOLES DE QUEIJO E PRESUNTO": "Risoles de Presunto e Queijo",
+      "ROMEU": "Romeu e Julieta",
+      "ROMEU E JULIETA": "Romeu e Julieta",
+      "SURPRESA DE UVA": "Surpresa de Uva",
+      "TOMATE": "Tomate Seco – Queijo",
+      "TOMATE SECO": "Tomate Seco – Queijo",
+      "TORTINHA DE LIMAO": "Tortinha de Limao Tradicional",
+      "TRUFA LIMAO": "Trufas de Limão",
+      "TRUFA MARACUJA": "Trufas de Maracujá",
+      "TRUFA TRADICIONAL": "Trufa Tradicional",
+      "TRUFAS CHOCOLATE": "Trufa Tradicional",
+    };
+
+
+    // ===============================================================
+    // ÍNDICE DE PRODUTOS DO DATA.JS
+    // Cria um mapa: nome_normalizado -> { produto, category, subcategory }
+    // ===============================================================
+    const indiceProdutos = new Map();
+
+    // Constrói o índice a partir do PRODUTOS do data.js
+    if (typeof PRODUTOS !== 'undefined') {
+      PRODUTOS.forEach(produto => {
+        const chave = produto.name.toUpperCase().trim();
+        // Armazena com a chave (pode haver duplicatas de nome entre categorias)
+        if (!indiceProdutos.has(chave)) {
+          indiceProdutos.set(chave, []);
+        }
+        indiceProdutos.get(chave).push(produto);
+      });
+    }
+
+
+    // ===============================================================
+    // PALAVRAS A IGNORAR NO PARSE (unidades, conectores)
+    // ===============================================================
+    const PALAVRAS_IGNORAR = new Set([
+      'CENTO', 'CENTOS', 'UN', 'UND', 'UNID', 'UNIDADE', 'UNIDADES',
+      'KG', 'KILO', 'KILOS', 'QUILOS', 'QUILO',
+      'X', 'DE', 'DO', 'DA', 'DOS', 'DAS', 'COM', 'E', 'OU'
+    ]);
+
+
+    // ===============================================================
+    // MOTOR DE PARSE
+    // ===============================================================
+
+    /**
+     * Limpa e normaliza uma string para comparação.
+     */
+    function normalizar(str) {
+      return str
+        .toUpperCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove acentos para comparação
+        .trim();
+    }
+
+    /**
+     * Remove palavras de unidade que aparecem logo após o número.
+     * Ex: "100 cento coxinha" -> "100 coxinha"
+     * Ex: "2 kg bolo" -> "2 bolo"
+     */
+    function removerUnidadeAposNumero(linha) {
+      // Padrão: número + espaço + unidade + espaço + resto
+      return linha.replace(
+        /^(\d+[\.,]?\d*)\s+(cento|centos|un|und|unid|unidade|unidades|kg|kilo|kilos|quilos|quilo)\s+/i,
+        '$1 '
+      );
+    }
+
+    /**
+     * Faz o parse de uma linha de texto e retorna { quantidade, textoItem }.
+     * Aceita formatos como:
+     *   "100 Coxinha Comum"
+     *   "50x Empada de Frango"
+     *   "2 kg Bolo de Chocolate"
+     */
+    function parseLinha(linha) {
+      linha = linha.trim();
+      if (!linha) return null;
+
+      // Remove unidade após número
+      linha = removerUnidadeAposNumero(linha);
+
+      // Tenta extrair quantidade no início
+      const matchQtd = linha.match(/^(\d+[\.,]?\d*)\s*[xX]?\s+(.+)/);
+      if (matchQtd) {
+        const quantidade = parseFloat(matchQtd[1].replace(',', '.'));
+        const textoItem = matchQtd[2].trim();
+        return { quantidade, textoItem };
+      }
+
+      // Tenta formato "Nome x Quantidade" ou "Nome - Quantidade"
+      const matchInvertido = linha.match(/^(.+?)\s*[-–xX]\s*(\d+[\.,]?\d*)\s*$/);
+      if (matchInvertido) {
+        const quantidade = parseFloat(matchInvertido[2].replace(',', '.'));
+        const textoItem = matchInvertido[1].trim();
+        return { quantidade, textoItem };
+      }
+
+      // Sem quantidade detectada — assume 100 (1 cento)
+      return { quantidade: 100, textoItem: linha };
+    }
+
+    /**
+     * Busca o produto no catálogo, priorizando:
+     * 1. Match exato no dicionário De-Para
+     * 2. Match exato no nome do PRODUTOS
+     * 3. Fuzzy match (a chave do dicionário contém o texto ou vice-versa)
+     *
+     * Retorna o produto encontrado ou null.
+     */
+    function buscarProduto(textoItem) {
+      const textoUpper = textoItem.toUpperCase().trim();
+      const textoNormalizado = normalizar(textoItem);
+
+      // 1) Match EXATO no dicionário De-Para
+      if (dicionarioDePara[textoUpper]) {
+        const nomeOficial = dicionarioDePara[textoUpper];
+        const produtos = indiceProdutos.get(nomeOficial.toUpperCase().trim());
+        if (produtos && produtos.length > 0) {
+          return produtos[0];
+        }
+      }
+
+      // Tenta com texto normalizado (sem acentos)
+      for (const [chave, valor] of Object.entries(dicionarioDePara)) {
+        if (normalizar(chave) === textoNormalizado) {
+          const produtos = indiceProdutos.get(valor.toUpperCase().trim());
+          if (produtos && produtos.length > 0) {
+            return produtos[0];
+          }
+        }
+      }
+
+      // 2) Match exato no nome do PRODUTOS
+      const produtosExato = indiceProdutos.get(textoUpper);
+      if (produtosExato && produtosExato.length > 0) {
+        return produtosExato[0];
+      }
+
+      // Tenta sem acentos
+      for (const [chave, lista] of indiceProdutos.entries()) {
+        if (normalizar(chave) === textoNormalizado) {
+          return lista[0];
+        }
+      }
+
+      // 3) Fuzzy match — ordena por tamanho de chave (mais longa = mais específica)
+      // Prioriza chaves do dicionário que são mais longas (mais específicas)
+      const chavesDicionario = Object.keys(dicionarioDePara)
+        .sort((a, b) => b.length - a.length);
+
+      for (const chave of chavesDicionario) {
+        const chaveNorm = normalizar(chave);
+        if (textoNormalizado === chaveNorm) continue; // Já testado acima
+
+        // Verifica se o texto contém a chave ou vice-versa
+        if (textoNormalizado.includes(chaveNorm) || chaveNorm.includes(textoNormalizado)) {
+          const nomeOficial = dicionarioDePara[chave];
+          const produtos = indiceProdutos.get(nomeOficial.toUpperCase().trim());
+          if (produtos && produtos.length > 0) {
+            return produtos[0];
+          }
+        }
+      }
+
+      // Fuzzy nos nomes do PRODUTOS diretamente
+      const nomesOrdenados = [...indiceProdutos.keys()]
+        .sort((a, b) => b.length - a.length);
+
+      for (const nomeKey of nomesOrdenados) {
+        const nomeNorm = normalizar(nomeKey);
+        if (textoNormalizado === nomeNorm) continue;
+        if (textoNormalizado.includes(nomeNorm) || nomeNorm.includes(textoNormalizado)) {
+          return indiceProdutos.get(nomeKey)[0];
+        }
+      }
+
+      return null;
+    }
+
+
+    // ===============================================================
+    // CALCULAR PREÇO
+    // Os preços do data.js são POR CENTO (100 un) ou POR KG.
+    // ===============================================================
+
+    /**
+     * Calcula o valor proporcional.
+     * Se o produto é por "cento" (100 un), proporção = qtd / 100.
+     * Se o produto é por "kg", proporção = qtd direta.
+     */
+    function calcularValor(produto, quantidade) {
+      if (produto.unit === 'kg') {
+        return produto.price * quantidade;
+      }
+      // Por cento
+      return (produto.price / 100) * quantidade;
+    }
+
+
+    // ===============================================================
+    // ESTRUTURA DE SEÇÕES DA COMANDA
+    // Mapeamento de category+subcategory para a seção de exibição.
+    // ===============================================================
+
+    const MAPA_SECOES = {
+      // Salgados
+      'salgados|fritos':   { grupo: 'Salgados',  secao: 'Fritos' },
+      'salgados|folhados': { grupo: 'Salgados',  secao: 'Folhados' },
+      'salgados|assados':  { grupo: 'Salgados',  secao: 'Assados' },
+      'salgados|extras':   { grupo: 'Extras',    secao: null },
+
+      // Doces
+      'doces|comuns':        { grupo: 'Doces', secao: 'Comuns' },
+      'doces|caramelizados': { grupo: 'Doces', secao: 'Caramelizados' },
+      'doces|gourmet':       { grupo: 'Doces', secao: 'Gourmet' },
+
+      // Bombons
+      'bombons|':            { grupo: 'Doces', secao: 'Bombons' },
+
+      // Bolos
+      'bolos|tradicionais':  { grupo: 'Bolos', secao: null },
+      'bolos|especiais':     { grupo: 'Bolos', secao: null },
+    };
+
+    function obterSecao(produto) {
+      const chave = `${produto.category}|${produto.subcategory || ''}`;
+      return MAPA_SECOES[chave] || { grupo: 'Outros', secao: null };
+    }
+
+
+    // ===============================================================
+    // GERAR COMANDA
+    // ===============================================================
+    function calcularPedido() {
+      const textoEntrada = document.getElementById('texto-pedido').value;
+      const feedbackEl = document.getElementById('feedback');
+      const resultadoEl = document.getElementById('secao-resultado');
+      const saidaEl = document.getElementById('comanda-saida');
+
+      // Esconde resultado anterior
+      resultadoEl.classList.remove('visivel');
+      feedbackEl.classList.remove('visivel');
+      feedbackEl.className = 'feedback';
+
+      // Valida entrada
+      if (!textoEntrada.trim()) {
+        mostrarFeedback('erro', '⚠️ Cole o texto do pedido antes de calcular.');
+        return;
+      }
+
+      // Variáveis para armazenar dados do cliente
+      let clienteExtraido = '';
+      let diaExtraido = '';
+      let horarioExtraido = '';
+      let contatoExtraido = '';
+
+      // Tenta extrair dados com regex antes de processar as linhas
+      const textoUpper = textoEntrada.toUpperCase();
+      
+      // Tenta achar dia (ex: 11/07/2026, 11/07)
+      const matchDia = textoEntrada.match(/\b(\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)\b/);
+      if (matchDia) diaExtraido = matchDia[1];
+
+      // Tenta achar horário (ex: às 09 horas, 14:30)
+      const matchHora = textoEntrada.match(/(?:às|as)\s*(\d{1,2}(?:\s*horas?)?)/i) || textoEntrada.match(/\b(\d{1,2}[:h]\d{2})\b/i);
+      if (matchHora) horarioExtraido = matchHora[1].replace(/horas?/i, 'h').trim();
+
+      // Tenta achar nome do cliente
+      const matchCliente = textoEntrada.match(/(?:Cliente|Nome|Para)\s*:\s*(.+)/i);
+      if (matchCliente) clienteExtraido = matchCliente[1].trim();
+
+      // Tenta achar contato
+      const matchContato = textoEntrada.match(/(?:Contato|Tel|Telefone|WhatsApp|Wpp)\s*:\s*([\d\s\-\(\)]+)/i);
+      if (matchContato) contatoExtraido = matchContato[1].trim();
+
+
+      // Parse de cada linha
+      const linhas = textoEntrada.split('\n');
+      const itensProcessados = []; // { nome, quantidade, produto, valor }
+      const naoReconhecidos = [];
+      let total = 0;
+
+      for (const linha of linhas) {
+        const linhaLimpa = linha.trim();
+        if (!linhaLimpa) continue;
+
+        // Ignora linhas que parecem ser cabeçalhos ou separadores
+        if (/^[-=_*#]{3,}$/.test(linhaLimpa)) continue;
+        if (/^(salgados?|doces?|bombons?|bolos?|extras?|folhados?|fritos?|assados?|comuns?|caramelizados?|gourmet)\s*:?\s*$/i.test(linhaLimpa)) continue;
+
+        // Ignora linhas que são de metadados se já foram capturados ou se parecem contexto puro
+        if (/^(?:Cliente|Nome|Para|Contato|Tel|Telefone|WhatsApp|Wpp)\s*:/i.test(linhaLimpa)) continue;
+        if (linhaLimpa.toLowerCase().startsWith('encomenda') || linhaLimpa.toLowerCase().startsWith('pedido de')) continue;
+
+        const parsed = parseLinha(linhaLimpa);
+        if (!parsed) continue;
+
+        // Se o item capturado for algo como "O dia 11/07", ignora
+        if (/^(o\s+)?dia/i.test(parsed.textoItem)) continue;
+
+        const produto = buscarProduto(parsed.textoItem);
+        if (!produto) {
+          // Só adiciona se não for uma linha que claramente não é produto e a qtde foi extraída como fallback 100
+          if (parsed.quantidade === 100 && parsed.textoItem.length > 40) continue; // Linha de texto longa sem qtde
+          naoReconhecidos.push(parsed.textoItem);
+          continue;
+        }
+
+        const valor = calcularValor(produto, parsed.quantidade);
+        total += valor;
+
+        itensProcessados.push({
+          nome: produto.name,
+          quantidade: parsed.quantidade,
+          produto,
+          valor
+        });
+      }
+
+      // Se nada foi processado
+      if (itensProcessados.length === 0 && naoReconhecidos.length === 0) {
+        mostrarFeedback('erro', '⚠️ Nenhum produto foi identificado. Verifique o formato do texto.');
+        return;
+      }
+
+      // Agrupa por seção
+      const grupos = {};
+      const ordemGrupos = ['Salgados', 'Doces', 'Outros', 'Extras', 'Bolos'];
+
+      for (const item of itensProcessados) {
+        const sec = obterSecao(item.produto);
+        const grupoNome = sec.grupo;
+        const secaoNome = sec.secao;
+
+        if (!grupos[grupoNome]) {
+          grupos[grupoNome] = {};
+        }
+
+        const chaveSecao = secaoNome || '__raiz__';
+        if (!grupos[grupoNome][chaveSecao]) {
+          grupos[grupoNome][chaveSecao] = [];
+        }
+
+        grupos[grupoNome][chaveSecao].push(item);
+      }
+
+      // Monta o texto da comanda
+      let comanda = '';
+
+      // Cabeçalho com dados do cliente extraídos
+      const hoje = new Date();
+      const dataISO = hoje.toISOString().split('T')[0];
+      const diaFallback = formatarData(dataISO);
+
+      comanda += `Dia: ${diaExtraido || diaFallback}\n`;
+      comanda += `Cliente: ${clienteExtraido || '________________________'}\n`;
+      comanda += `Horário de retirada: ${horarioExtraido || '__:__'}\n`;
+      if (contatoExtraido) {
+          comanda += `Contato: ${contatoExtraido}\n`;
+      } else {
+          comanda += `Contato: ________________________\n`;
+      }
+
+      // Ordem específica das seções solicitada
+      const ordemSecoesCustom = {
+        'Fritos': 1,
+        'Folhados': 2,
+        'Assados': 3,
+        'Comuns': 1,
+        'Bombons': 2,
+        'Caramelizados': 3,
+        'Gourmet': 4
+      };
+
+      // Corpo da comanda por grupos
+      for (const grupoNome of ordemGrupos) {
+        if (!grupos[grupoNome]) continue;
+
+        comanda += `\n${grupoNome}\n`;
+
+        const secoes = grupos[grupoNome];
+
+        // Ordena seções baseada na ordem customizada
+        const chavesSecoes = Object.keys(secoes).sort((a, b) => {
+          if (a === '__raiz__') return 1;
+          if (b === '__raiz__') return -1;
+          const posA = ordemSecoesCustom[a] || 99;
+          const posB = ordemSecoesCustom[b] || 99;
+          if (posA === posB) return a.localeCompare(b);
+          return posA - posB;
+        });
+
+        for (const chaveSecao of chavesSecoes) {
+          if (chaveSecao !== '__raiz__') {
+            comanda += `  ${chaveSecao}\n`;
+          }
+
+          for (const item of secoes[chaveSecao]) {
+            const qtdFormatada = Number.isInteger(item.quantidade)
+              ? item.quantidade.toString()
+              : item.quantidade.toFixed(1).replace('.', ',');
+            comanda += `  ${qtdFormatada}x ${item.nome} (R$ ${formatarMoeda(item.valor)})\n`;
+          }
+        }
+      }
+
+      // Total
+      comanda += `\n*Total: R$ ${formatarMoeda(total)}*`;
+
+      // Exibe resultado
+      saidaEl.textContent = comanda;
+      resultadoEl.classList.add('visivel');
+
+      // Scroll suave até o resultado
+      resultadoEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Feedback
+      if (naoReconhecidos.length > 0) {
+        let msg = `⚠️ Pedido calculado, mas ${naoReconhecidos.length} item(ns) não foi(foram) reconhecido(s):`;
+        msg += '<ul class="lista-alertas">';
+        for (const item of naoReconhecidos) {
+          msg += `<li>"${escapeHTML(item)}"</li>`;
+        }
+        msg += '</ul>';
+        mostrarFeedback('aviso', msg);
+      } else {
+        mostrarFeedback('sucesso', `✅ Pedido calculado com sucesso! ${itensProcessados.length} produto(s) identificado(s).`);
+      }
+    }
+
+
+    // ===============================================================
+    // COPIAR COMANDA
+    // ===============================================================
+    function copiarComanda() {
+      const saidaEl = document.getElementById('comanda-saida');
+      const texto = saidaEl.textContent;
+
+      if (!texto) {
+        mostrarFeedback('erro', '⚠️ Nenhuma comanda para copiar.');
+        return;
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto).then(() => {
+          mostrarFeedback('sucesso', '✅ Comanda copiada para a área de transferência!');
+          // Pisca o botão
+          const btn = document.getElementById('btn-copiar');
+          btn.textContent = '✅ Copiado!';
+          setTimeout(() => { btn.innerHTML = '📋 Copiar Comanda'; }, 2000);
+        }).catch(() => {
+          copiarFallback(texto);
+        });
+      } else {
+        copiarFallback(texto);
+      }
+    }
+
+    function copiarFallback(texto) {
+      const textarea = document.createElement('textarea');
+      textarea.value = texto;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        mostrarFeedback('sucesso', '✅ Comanda copiada!');
+      } catch (e) {
+        mostrarFeedback('erro', '⚠️ Não foi possível copiar. Selecione o texto manualmente.');
+      }
+      document.body.removeChild(textarea);
+    }
+
+
+    // ===============================================================
+    // LIMPAR TUDO
+    // ===============================================================
+    function limparTudo() {
+      document.getElementById('texto-pedido').value = '';
+      document.getElementById('comanda-saida').textContent = '';
+      document.getElementById('secao-resultado').classList.remove('visivel');
+
+      const feedbackEl = document.getElementById('feedback');
+      feedbackEl.classList.remove('visivel');
+      feedbackEl.className = 'feedback';
+
+      // Foca no campo de cliente
+      document.getElementById('campo-cliente').focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+
+    // ===============================================================
+    // UTILITÁRIOS
+    // ===============================================================
+
+    function formatarMoeda(valor) {
+      return valor.toFixed(2).replace('.', ',');
+    }
+
+    function formatarData(dataISO) {
+      // Converte "2026-08-03" -> "03/08/2026"
+      const partes = dataISO.split('-');
+      if (partes.length === 3) {
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+      }
+      return dataISO;
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function mostrarFeedback(tipo, mensagem) {
+      const el = document.getElementById('feedback');
+      el.className = `feedback visivel feedback--${tipo}`;
+      el.innerHTML = mensagem;
+    }
+
+
+    // ===============================================================
+    // INICIALIZAÇÃO
+    // ===============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Foco no campo de pedido
+      document.getElementById('texto-pedido').focus();
+    });
+  </script>
+
+</body>
+
+</html>
