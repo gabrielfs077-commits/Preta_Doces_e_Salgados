@@ -814,6 +814,10 @@ Exemplo:
       "ROMEU": "Romeu e Julieta",
       "ROMEU E JULIETA": "Romeu e Julieta",
       "SURPRESA DE UVA": "Surpresa de Uva",
+      "SUSPIROS": "Suspiro",
+      "TAXA DE FRITURA": "Taxa de Fritura",
+      "FRITURA NO LOCAL": "Taxa de Fritura",
+      "SERVICO DE FRITURA": "Taxa de Fritura",
       "TOMATE": "Tomate Seco – Queijo",
       "TOMATE SECO": "Tomate Seco – Queijo",
       "TORTINHA DE LIMAO": "Tortinha de Limao Tradicional",
@@ -823,18 +827,10 @@ Exemplo:
       "TRUFAS CHOCOLATE": "Trufa Tradicional",
     };
 
-
-    // ===============================================================
-    // ÍNDICE DE PRODUTOS DO DATA.JS
-    // Cria um mapa: nome_normalizado -> { produto, category, subcategory }
-    // ===============================================================
     const indiceProdutos = new Map();
-
-    // Constrói o índice a partir do PRODUTOS do data.js
     if (typeof PRODUTOS !== 'undefined') {
       PRODUTOS.forEach(produto => {
         const chave = produto.name.toUpperCase().trim();
-        // Armazena com a chave (pode haver duplicatas de nome entre categorias)
         if (!indiceProdutos.has(chave)) {
           indiceProdutos.set(chave, []);
         }
@@ -842,198 +838,55 @@ Exemplo:
       });
     }
 
-
-    // ===============================================================
-    // PALAVRAS A IGNORAR NO PARSE (unidades, conectores)
-    // ===============================================================
     const PALAVRAS_IGNORAR = new Set([
       'CENTO', 'CENTOS', 'UN', 'UND', 'UNID', 'UNIDADE', 'UNIDADES',
       'KG', 'KILO', 'KILOS', 'QUILOS', 'QUILO',
       'X', 'DE', 'DO', 'DA', 'DOS', 'DAS', 'COM', 'E', 'OU'
     ]);
 
-
-    // ===============================================================
-    // MOTOR DE PARSE
-    // ===============================================================
-
-    /**
-     * Limpa e normaliza uma string para comparação.
-     */
     function normalizar(str) {
       return str
         .toUpperCase()
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '') // Remove acentos para comparação
+        .replace(/[\u0300-\u036f]/g, '')
         .trim();
     }
 
-    /**
-     * Remove palavras de unidade que aparecem logo após o número.
-     * Ex: "100 cento coxinha" -> "100 coxinha"
-     * Ex: "2 kg bolo" -> "2 bolo"
-     */
-    function removerUnidadeAposNumero(linha) {
-      // Padrão: número + espaço + unidade + espaço + resto
-      return linha.replace(
-        /^(\d+[\.,]?\d*)\s+(cento|centos|un|und|unid|unidade|unidades|kg|kilo|kilos|quilos|quilo)\s+/i,
-        '$1 '
-      );
-    }
-
-    /**
-     * Faz o parse de uma linha de texto e retorna { quantidade, textoItem }.
-     * Aceita formatos como:
-     *   "100 Coxinha Comum"
-     *   "50x Empada de Frango"
-     *   "2 kg Bolo de Chocolate"
-     */
-    function parseLinha(linha) {
-      linha = linha.trim();
-      if (!linha) return null;
-
-      // Remove unidade após número
-      linha = removerUnidadeAposNumero(linha);
-
-      // Tenta extrair quantidade no início
-      const matchQtd = linha.match(/^(\d+[\.,]?\d*)\s*[xX]?\s+(.+)/);
-      if (matchQtd) {
-        const quantidade = parseFloat(matchQtd[1].replace(',', '.'));
-        const textoItem = matchQtd[2].trim();
-        return { quantidade, textoItem };
-      }
-
-      // Tenta formato "Nome x Quantidade" ou "Nome - Quantidade"
-      const matchInvertido = linha.match(/^(.+?)\s*[-–xX]\s*(\d+[\.,]?\d*)\s*$/);
-      if (matchInvertido) {
-        const quantidade = parseFloat(matchInvertido[2].replace(',', '.'));
-        const textoItem = matchInvertido[1].trim();
-        return { quantidade, textoItem };
-      }
-
-      // Sem quantidade detectada — assume 100 (1 cento)
-      return { quantidade: 100, textoItem: linha };
-    }
-
-    /**
-     * Busca o produto no catálogo, priorizando:
-     * 1. Match exato no dicionário De-Para
-     * 2. Match exato no nome do PRODUTOS
-     * 3. Fuzzy match (a chave do dicionário contém o texto ou vice-versa)
-     *
-     * Retorna o produto encontrado ou null.
-     */
-    function buscarProduto(textoItem) {
-      const textoUpper = textoItem.toUpperCase().trim();
-      const textoNormalizado = normalizar(textoItem);
-
-      // 1) Match EXATO no dicionário De-Para
-      if (dicionarioDePara[textoUpper]) {
-        const nomeOficial = dicionarioDePara[textoUpper];
-        const produtos = indiceProdutos.get(nomeOficial.toUpperCase().trim());
-        if (produtos && produtos.length > 0) {
-          return produtos[0];
-        }
-      }
-
-      // Tenta com texto normalizado (sem acentos)
-      for (const [chave, valor] of Object.entries(dicionarioDePara)) {
-        if (normalizar(chave) === textoNormalizado) {
-          const produtos = indiceProdutos.get(valor.toUpperCase().trim());
-          if (produtos && produtos.length > 0) {
-            return produtos[0];
-          }
-        }
-      }
-
-      // 2) Match exato no nome do PRODUTOS
-      const produtosExato = indiceProdutos.get(textoUpper);
-      if (produtosExato && produtosExato.length > 0) {
-        return produtosExato[0];
-      }
-
-      // Tenta sem acentos
-      for (const [chave, lista] of indiceProdutos.entries()) {
-        if (normalizar(chave) === textoNormalizado) {
-          return lista[0];
-        }
-      }
-
-      // 3) Fuzzy match — ordena por tamanho de chave (mais longa = mais específica)
-      // Prioriza chaves do dicionário que são mais longas (mais específicas)
-      const chavesDicionario = Object.keys(dicionarioDePara)
-        .sort((a, b) => b.length - a.length);
-
-      for (const chave of chavesDicionario) {
-        const chaveNorm = normalizar(chave);
-        if (textoNormalizado === chaveNorm) continue; // Já testado acima
-
-        // Verifica se o texto contém a chave ou vice-versa
-        if (textoNormalizado.includes(chaveNorm) || chaveNorm.includes(textoNormalizado)) {
-          const nomeOficial = dicionarioDePara[chave];
-          const produtos = indiceProdutos.get(nomeOficial.toUpperCase().trim());
-          if (produtos && produtos.length > 0) {
-            return produtos[0];
-          }
-        }
-      }
-
-      // Fuzzy nos nomes do PRODUTOS diretamente
-      const nomesOrdenados = [...indiceProdutos.keys()]
-        .sort((a, b) => b.length - a.length);
-
-      for (const nomeKey of nomesOrdenados) {
-        const nomeNorm = normalizar(nomeKey);
-        if (textoNormalizado === nomeNorm) continue;
-        if (textoNormalizado.includes(nomeNorm) || nomeNorm.includes(textoNormalizado)) {
-          return indiceProdutos.get(nomeKey)[0];
-        }
-      }
-
-      return null;
-    }
-
-
     // ===============================================================
-    // CALCULAR PREÇO
-    // Os preços do data.js são POR CENTO (100 un) ou POR KG.
+    // CÉREBRO UNIFICADO DE TOKENS (De-Para + Catálogo)
     // ===============================================================
+    const termosMap = new Map();
+    // 1. Adiciona todos os nomes oficiais do catálogo
+    for (const [chave, lista] of indiceProdutos.entries()) {
+      termosMap.set(normalizar(chave), lista[0]);
+    }
+    // 2. Adiciona/Sobrescreve com as variações do Dicionário
+    for (const [chave, oficial] of Object.entries(dicionarioDePara)) {
+      const prodLista = indiceProdutos.get(oficial.toUpperCase().trim());
+      if (prodLista && prodLista.length > 0) {
+        termosMap.set(normalizar(chave), prodLista[0]);
+      }
+    }
+    // Ordena do maior texto para o menor (prioriza matches específicos)
+    const termosConhecidos = Array.from(termosMap.entries())
+      .map(([termo, produto]) => ({ termo, produto }))
+      .sort((a, b) => b.termo.length - a.termo.length);
 
-    /**
-     * Calcula o valor proporcional.
-     * Se o produto é por "cento" (100 un), proporção = qtd / 100.
-     * Se o produto é por "kg", proporção = qtd direta.
-     */
+
     function calcularValor(produto, quantidade) {
-      if (produto.unit === 'kg') {
-        return produto.price * quantidade;
-      }
-      // Por cento
+      if (produto.unit === 'kg' || produto.unit === 'unidade' || produto.unit === 'unit') return produto.price * quantidade;
       return (produto.price / 100) * quantidade;
     }
 
-
-    // ===============================================================
-    // ESTRUTURA DE SEÇÕES DA COMANDA
-    // Mapeamento de category+subcategory para a seção de exibição.
-    // ===============================================================
-
     const MAPA_SECOES = {
-      // Salgados
       'salgados|fritos':   { grupo: 'Salgados',  secao: 'Fritos' },
       'salgados|folhados': { grupo: 'Salgados',  secao: 'Folhados' },
       'salgados|assados':  { grupo: 'Salgados',  secao: 'Assados' },
       'salgados|extras':   { grupo: 'Extras',    secao: null },
-
-      // Doces
       'doces|comuns':        { grupo: 'Doces', secao: 'Comuns' },
       'doces|caramelizados': { grupo: 'Doces', secao: 'Caramelizados' },
       'doces|gourmet':       { grupo: 'Doces', secao: 'Gourmet' },
-
-      // Bombons
       'bombons|':            { grupo: 'Doces', secao: 'Bombons' },
-
-      // Bolos
       'bolos|tradicionais':  { grupo: 'Bolos', secao: null },
       'bolos|especiais':     { grupo: 'Bolos', secao: null },
     };
@@ -1043,9 +896,8 @@ Exemplo:
       return MAPA_SECOES[chave] || { grupo: 'Outros', secao: null };
     }
 
-
     // ===============================================================
-    // GERAR COMANDA
+    // EXTRAÇÃO E COMANDA
     // ===============================================================
     function calcularPedido() {
       const textoEntrada = document.getElementById('texto-pedido').value;
@@ -1053,190 +905,198 @@ Exemplo:
       const resultadoEl = document.getElementById('secao-resultado');
       const saidaEl = document.getElementById('comanda-saida');
 
-      // Esconde resultado anterior
       resultadoEl.classList.remove('visivel');
       feedbackEl.classList.remove('visivel');
       feedbackEl.className = 'feedback';
 
-      // Valida entrada
       if (!textoEntrada.trim()) {
         mostrarFeedback('erro', '⚠️ Cole o texto do pedido antes de calcular.');
         return;
       }
 
-      // Variáveis para armazenar dados do cliente
+      // Variável de trabalho para limpar metadados preservando os índices originais
+      let textoLimpo = textoEntrada;
+
       let clienteExtraido = '';
       let diaExtraido = '';
       let horarioExtraido = '';
       let contatoExtraido = '';
 
-      // Tenta extrair dados com regex antes de processar as linhas
-      const textoUpper = textoEntrada.toUpperCase();
+      // EXTRAÇÃO DE METADADOS (e ocultação deles do texto base)
+      const MESES = 'janeiro|fevereiro|março|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro';
+      const matchDia = textoLimpo.match(
+        new RegExp(`\\b(\\d{1,2}\\/\\d{1,2}(?:\\/\\d{2,4})?)\\b|\\b(\\d{1,2})\\s+de\\s+(${MESES})\\b`, 'i')
+      );
+      if (matchDia) {
+        if (matchDia[1]) diaExtraido = matchDia[1];
+        else if (matchDia[2] && matchDia[3]) diaExtraido = `${matchDia[2]} de ${matchDia[3]}`;
+        textoLimpo = textoLimpo.replace(matchDia[0], ' '.repeat(matchDia[0].length));
+      }
+
+      const matchHora = textoLimpo.match(/(?:às|as)\s*(\d{1,2})\s*(?:horas?|h)/i) || textoLimpo.match(/\b(\d{1,2}[:h]\d{2})\b/i);
+      if (matchHora) {
+        horarioExtraido = matchHora[1].replace(/horas?/i, 'h').trim();
+        textoLimpo = textoLimpo.replace(matchHora[0], ' '.repeat(matchHora[0].length));
+      }
+
+      const matchCliente = textoLimpo.match(/(?:Cliente|Nome|Para)\s*:\s*([^\n]+)/i);
+      if (matchCliente) {
+        clienteExtraido = matchCliente[1].trim();
+        textoLimpo = textoLimpo.replace(matchCliente[0], ' '.repeat(matchCliente[0].length));
+      }
+
+      const matchContato = textoLimpo.match(/(?:Contato|Tel|Telefone|WhatsApp|Wpp)\s*:\s*([\d\s\-\(\)]+)/i);
+      if (matchContato) {
+        contatoExtraido = matchContato[1].trim();
+        textoLimpo = textoLimpo.replace(matchContato[0], ' '.repeat(matchContato[0].length));
+      }
+
+
+      // SCANNER DE TOKENS — NOVO CÉREBRO
+      const textoNorm = normalizar(textoLimpo);
       
-      // Tenta achar dia (ex: 11/07/2026, 11/07)
-      const matchDia = textoEntrada.match(/\b(\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)\b/);
-      if (matchDia) diaExtraido = matchDia[1];
-
-      // Tenta achar horário (ex: às 09 horas, 14:30)
-      const matchHora = textoEntrada.match(/(?:às|as)\s*(\d{1,2}(?:\s*horas?)?)/i) || textoEntrada.match(/\b(\d{1,2}[:h]\d{2})\b/i);
-      if (matchHora) horarioExtraido = matchHora[1].replace(/horas?/i, 'h').trim();
-
-      // Tenta achar nome do cliente
-      const matchCliente = textoEntrada.match(/(?:Cliente|Nome|Para)\s*:\s*(.+)/i);
-      if (matchCliente) clienteExtraido = matchCliente[1].trim();
-
-      // Tenta achar contato
-      const matchContato = textoEntrada.match(/(?:Contato|Tel|Telefone|WhatsApp|Wpp)\s*:\s*([\d\s\-\(\)]+)/i);
-      if (matchContato) contatoExtraido = matchContato[1].trim();
-
-
-      // Parse de cada linha
-      const linhas = textoEntrada.split('\n');
-      const itensProcessados = []; // { nome, quantidade, produto, valor }
-      const naoReconhecidos = [];
-      let total = 0;
-
-      for (const linha of linhas) {
-        const linhaLimpa = linha.trim();
-        if (!linhaLimpa) continue;
-
-        // Ignora linhas que parecem ser cabeçalhos ou separadores
-        if (/^[-=_*#]{3,}$/.test(linhaLimpa)) continue;
-        if (/^(salgados?|doces?|bombons?|bolos?|extras?|folhados?|fritos?|assados?|comuns?|caramelizados?|gourmet)\s*:?\s*$/i.test(linhaLimpa)) continue;
-
-        // Ignora linhas que são de metadados se já foram capturados ou se parecem contexto puro
-        if (/^(?:Cliente|Nome|Para|Contato|Tel|Telefone|WhatsApp|Wpp)\s*:/i.test(linhaLimpa)) continue;
-        if (linhaLimpa.toLowerCase().startsWith('encomenda') || linhaLimpa.toLowerCase().startsWith('pedido de')) continue;
-
-        const parsed = parseLinha(linhaLimpa);
-        if (!parsed) continue;
-
-        // Se o item capturado for algo como "O dia 11/07", ignora
-        if (/^(o\s+)?dia/i.test(parsed.textoItem)) continue;
-
-        const produto = buscarProduto(parsed.textoItem);
-        if (!produto) {
-          // Só adiciona se não for uma linha que claramente não é produto e a qtde foi extraída como fallback 100
-          if (parsed.quantidade === 100 && parsed.textoItem.length > 40) continue; // Linha de texto longa sem qtde
-          naoReconhecidos.push(parsed.textoItem);
-          continue;
-        }
-
-        const valor = calcularValor(produto, parsed.quantidade);
-        total += valor;
-
-        itensProcessados.push({
-          nome: produto.name,
-          quantidade: parsed.quantidade,
-          produto,
-          valor
+      // 1. Mapeia todos os números presentes no texto limpo
+      const regexNum = /(\d+(?:[.,]\d+)?)/g;
+      const numeros = [];
+      let match;
+      while ((match = regexNum.exec(textoNorm)) !== null) {
+        numeros.push({
+          valor: parseFloat(match[1].replace(',', '.')),
+          index: match.index,
+          usado: false
         });
       }
 
-      // Se nada foi processado
+      // 2. Busca termos do dicionário no texto (marca caracteres para evitar sobreposição)
+      const produtosEncontrados = [];
+      const consumido = new Set();
+
+      for (const { termo, produto } of termosConhecidos) {
+        let startIndex = 0;
+        while ((startIndex = textoNorm.indexOf(termo, startIndex)) > -1) {
+          let sobreposicao = false;
+          for (let i = startIndex; i < startIndex + termo.length; i++) {
+            if (consumido.has(i)) { sobreposicao = true; break; }
+          }
+
+          if (!sobreposicao) {
+            for (let i = startIndex; i < startIndex + termo.length; i++) consumido.add(i);
+            produtosEncontrados.push({ produto, index: startIndex });
+          }
+          startIndex += termo.length;
+        }
+      }
+
+      // 3. Associa cada produto ao número mais próximo
+      produtosEncontrados.sort((a, b) => a.index - b.index);
+      const consolidado = new Map(); // id -> { produto, quantidade }
+
+      for (const p of produtosEncontrados) {
+        let nearestNum = null;
+        let minDistance = Infinity;
+
+        for (const n of numeros) {
+          if (n.usado) continue;
+          let distance = p.index - n.index;
+          
+          if (Math.abs(distance) > 100) continue; // Distância máxima permitida
+          
+          // Penaliza números que aparecem DEPOIS do produto, preferindo os que vêm ANTES
+          let score = distance >= 0 ? distance : Math.abs(distance) * 2;
+
+          if (score < minDistance) {
+            minDistance = score;
+            nearestNum = n;
+          }
+        }
+
+        let quantidade = 100; // Padrão se não achar número
+        if (nearestNum) {
+          quantidade = nearestNum.valor;
+          nearestNum.usado = true;
+        } else {
+          // Regra da Quantidade Implícita para Serviços/Taxas
+          const isServico = p.produto.unit === 'unidade' || p.produto.unit === 'unit' || (p.produto.category && p.produto.category.toLowerCase() === 'extras' && p.produto.name.toLowerCase().includes('fritura'));
+          if (isServico) {
+            quantidade = 1;
+          }
+        }
+
+        const id = p.produto.id;
+        if (consolidado.has(id)) {
+          consolidado.get(id).quantidade += quantidade;
+        } else {
+          consolidado.set(id, { produto: p.produto, quantidade });
+        }
+      }
+
+      const itensProcessados = [...consolidado.values()];
+
+      // 4. Identifica itens não reconhecidos (números que sobraram órfãos)
+      const naoReconhecidos = [];
+      for (const n of numeros) {
+        if (!n.usado) {
+          // Extrai o contexto ao redor do número órfão para feedback
+          const contexto = textoLimpo.substring(n.index, n.index + 35).replace(/\n/g, ' ').trim();
+          if (contexto.length > 3 && !/^(0|00|11)$/.test(contexto)) {
+             naoReconhecidos.push(contexto + "...");
+          }
+        }
+      }
       if (itensProcessados.length === 0 && naoReconhecidos.length === 0) {
         mostrarFeedback('erro', '⚠️ Nenhum produto foi identificado. Verifique o formato do texto.');
         return;
       }
 
-      // Agrupa por seção
+      let total = 0;
+      for (const item of itensProcessados) {
+        item.valor = calcularValor(item.produto, item.quantidade);
+        total += item.valor;
+      }
+
       const grupos = {};
       const ordemGrupos = ['Salgados', 'Doces', 'Outros', 'Extras', 'Bolos'];
-
       for (const item of itensProcessados) {
         const sec = obterSecao(item.produto);
         const grupoNome = sec.grupo;
         const secaoNome = sec.secao;
-
-        if (!grupos[grupoNome]) {
-          grupos[grupoNome] = {};
-        }
-
+        if (!grupos[grupoNome]) grupos[grupoNome] = {};
         const chaveSecao = secaoNome || '__raiz__';
-        if (!grupos[grupoNome][chaveSecao]) {
-          grupos[grupoNome][chaveSecao] = [];
-        }
-
+        if (!grupos[grupoNome][chaveSecao]) grupos[grupoNome][chaveSecao] = [];
         grupos[grupoNome][chaveSecao].push(item);
       }
 
-      // Monta o texto da comanda
-      let comanda = '';
+      const ordemSecoesCustom = { 'Fritos': 1, 'Folhados': 2, 'Assados': 3, 'Comuns': 1, 'Bombons': 2, 'Caramelizados': 3, 'Gourmet': 4 };
+      let comanda = `Dia: ${diaExtraido}\nCliente: ${clienteExtraido}\nHorário de retirada: ${horarioExtraido}\nContato: ${contatoExtraido}\n`;
 
-      // Cabeçalho com dados do cliente extraídos
-      const hoje = new Date();
-      const dataISO = hoje.toISOString().split('T')[0];
-      const diaFallback = formatarData(dataISO);
-
-      comanda += `Dia: ${diaExtraido || diaFallback}\n`;
-      comanda += `Cliente: ${clienteExtraido || '________________________'}\n`;
-      comanda += `Horário de retirada: ${horarioExtraido || '__:__'}\n`;
-      if (contatoExtraido) {
-          comanda += `Contato: ${contatoExtraido}\n`;
-      } else {
-          comanda += `Contato: ________________________\n`;
-      }
-
-      // Ordem específica das seções solicitada
-      const ordemSecoesCustom = {
-        'Fritos': 1,
-        'Folhados': 2,
-        'Assados': 3,
-        'Comuns': 1,
-        'Bombons': 2,
-        'Caramelizados': 3,
-        'Gourmet': 4
-      };
-
-      // Corpo da comanda por grupos
       for (const grupoNome of ordemGrupos) {
         if (!grupos[grupoNome]) continue;
-
         comanda += `\n${grupoNome}\n`;
-
         const secoes = grupos[grupoNome];
-
-        // Ordena seções baseada na ordem customizada
         const chavesSecoes = Object.keys(secoes).sort((a, b) => {
           if (a === '__raiz__') return 1;
           if (b === '__raiz__') return -1;
           const posA = ordemSecoesCustom[a] || 99;
           const posB = ordemSecoesCustom[b] || 99;
-          if (posA === posB) return a.localeCompare(b);
           return posA - posB;
         });
-
         for (const chaveSecao of chavesSecoes) {
-          if (chaveSecao !== '__raiz__') {
-            comanda += `  ${chaveSecao}\n`;
-          }
-
+          if (chaveSecao !== '__raiz__') comanda += `  ${chaveSecao}\n`;
           for (const item of secoes[chaveSecao]) {
-            const qtdFormatada = Number.isInteger(item.quantidade)
-              ? item.quantidade.toString()
-              : item.quantidade.toFixed(1).replace('.', ',');
-            comanda += `  ${qtdFormatada}x ${item.nome} (R$ ${formatarMoeda(item.valor)})\n`;
+            const qtdFormatada = Number.isInteger(item.quantidade) ? item.quantidade.toString() : item.quantidade.toFixed(1).replace('.', ',');
+            comanda += `  ${qtdFormatada}x ${item.produto.name}\n`;
           }
         }
       }
 
-      // Total
       comanda += `\n*Total: R$ ${formatarMoeda(total)}*`;
-
-      // Exibe resultado
       saidaEl.textContent = comanda;
       resultadoEl.classList.add('visivel');
-
-      // Scroll suave até o resultado
       resultadoEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-      // Feedback
       if (naoReconhecidos.length > 0) {
-        let msg = `⚠️ Pedido calculado, mas ${naoReconhecidos.length} item(ns) não foi(foram) reconhecido(s):`;
-        msg += '<ul class="lista-alertas">';
-        for (const item of naoReconhecidos) {
-          msg += `<li>"${escapeHTML(item)}"</li>`;
-        }
+        let msg = `⚠️ Pedido calculado, mas ${naoReconhecidos.length} item(ns) não foi(foram) reconhecido(s):<ul class="lista-alertas">`;
+        for (const item of naoReconhecidos) msg += `<li>"${escapeHTML(item)}"</li>`;
         msg += '</ul>';
         mostrarFeedback('aviso', msg);
       } else {
@@ -1244,10 +1104,6 @@ Exemplo:
       }
     }
 
-
-    // ===============================================================
-    // COPIAR COMANDA
-    // ===============================================================
     function copiarComanda() {
       const saidaEl = document.getElementById('comanda-saida');
       const texto = saidaEl.textContent;
