@@ -550,8 +550,8 @@ Exemplo:
       "B. CALABRUSA": "Bolinha de Calabresa",
       "B. DE AZEITONA COM QUEIJO": "Bolinha de Azeitona com Queijo",
       "B. DE CALABRESA": "Bolinha de Calabresa",
-      "B. DE FRANGO": "Coxinha com Catupiry",
-      "B. FRANGO": "Coxinha com Catupiry",
+      "B. DE FRANGO": "Cox. com Catupiry",
+      "B. FRANGO": "Cox. com Catupiry",
       "BACALHAU": "Bacalhau",
       "BAIANINHO": "Baianinho com Coco/Amendoim",
       "BANANA": "Banana com Queijo",
@@ -566,7 +566,9 @@ Exemplo:
       "BICHO DE PE": "Bicho de Pé",
       "BICHO DE PÉ": "Bicho de Pé",
       "BICHO PÉ": "Bicho de Pé",
-      "BOLINHA DE FRANGO": "Coxinha com Catupiry",
+      "BOLINHA DE FRANGO": "Cox. com Catupiry",
+      "BOLINHA DE QUEIJO": "Pérola de Queijo",
+      "BOLINHAS DE QUEIJO": "Pérola de Queijo",
       "BOMBOM AMEIXA": "Ameixa",
       "BOMBOM BRIG. BRANCO": "Brigadeiro Branco",
       "BOMBOM BRIG. LIMAO": "Brigadeiro de Limão",
@@ -630,9 +632,12 @@ Exemplo:
       "COX": "Coxinha Comum",
       "COX COMUM": "Coxinha Comum",
       "COX.": "Coxinha Comum",
-      "COX. C/ CATUPIRY": "Coxinha com Catupiry",
+      "COX. C/ CATUPIRY": "Cox. com Catupiry",
       "COXINHA": "Coxinha Comum",
-      "COXINHA COM CATUPIRY": "Coxinha com Catupiry",
+      "COXINHA COM CATUPIRY": "Cox. com Catupiry",
+      "COXINHAS COM CATUPIRY": "Cox. com Catupiry",
+      "COXINHA SEM CATUPIRY": "Coxinha Comum",
+      "COXINHAS SEM CATUPIRY": "Coxinha Comum",
       "COXINHA COMUM": "Coxinha Comum",
       "COXINHAS": "Coxinha Comum",
       "DOCINHO DE DAMASCO": "Docinho de Damasco",
@@ -809,7 +814,7 @@ Exemplo:
       "RISOLE GORGONZOLA": "Risoles de Gorgonzola",
       "RISOLE MILHO": "Risoles de Milho",
       "RISOLE NAPOLITANO": "Risoles de Presunto e Queijo",
-      "RISOLE QUEIJO E PRESUNTO": "Risoles de Presunto e Queijo",
+      "RISOLE QUEIJO E PRESUNTO": "Risole – Presunto e Queijo",
       "RISOLES DE QUEIJO E PRESUNTO": "Risoles de Presunto e Queijo",
       "ROMEU": "Romeu e Julieta",
       "ROMEU E JULIETA": "Romeu e Julieta",
@@ -951,98 +956,79 @@ Exemplo:
         textoLimpo = textoLimpo.replace(matchContato[0], ' '.repeat(matchContato[0].length));
       }
 
+      // REGRAS DE MÁSCARA — Fim dos números de telefone lidos como quantidades
+      textoLimpo = textoLimpo.replace(/\b\d{4,5}[- ]?\d{4}\b/g, (m) => ' '.repeat(m.length));
+      textoLimpo = textoLimpo.replace(/\b\d{4,5}\b/g, (match) => {
+        // Preserva números exatos como 1000, 2000 que podem ser salgados
+        if (/^[1-9]000$/.test(match)) return match;
+        return ' '.repeat(match.length);
+      });
 
-      // SCANNER DE TOKENS — NOVO CÉREBRO
-      const textoNorm = normalizar(textoLimpo);
-      
-      // 1. Mapeia todos os números presentes no texto limpo
-      const regexNum = /(\d+(?:[.,]\d+)?)/g;
-      const numeros = [];
-      let match;
-      while ((match = regexNum.exec(textoNorm)) !== null) {
-        numeros.push({
-          valor: parseFloat(match[1].replace(',', '.')),
-          index: match.index,
-          usado: false
-        });
-      }
-
-      // 2. Busca termos do dicionário no texto (marca caracteres para evitar sobreposição)
-      const produtosEncontrados = [];
-      const consumido = new Set();
-
-      for (const { termo, produto } of termosConhecidos) {
-        let startIndex = 0;
-        while ((startIndex = textoNorm.indexOf(termo, startIndex)) > -1) {
-          let sobreposicao = false;
-          for (let i = startIndex; i < startIndex + termo.length; i++) {
-            if (consumido.has(i)) { sobreposicao = true; break; }
-          }
-
-          if (!sobreposicao) {
-            for (let i = startIndex; i < startIndex + termo.length; i++) consumido.add(i);
-            produtosEncontrados.push({ produto, index: startIndex });
-          }
-          startIndex += termo.length;
-        }
-      }
-
-      // 3. Associa cada produto ao número mais próximo
-      produtosEncontrados.sort((a, b) => a.index - b.index);
+      // SCANNER DE TOKENS — PARSE DESTRUTIVO E LOOK-BEHIND
+      let textoNorm = normalizar(textoLimpo);
       const consolidado = new Map(); // id -> { produto, quantidade }
 
-      for (const p of produtosEncontrados) {
-        let nearestNum = null;
-        let minDistance = Infinity;
-
-        for (const n of numeros) {
-          if (n.usado) continue;
-          let distance = p.index - n.index;
+      // Busca os termos por ordem de tamanho (maiores primeiro matam os menores)
+      for (const { termo, produto } of termosConhecidos) {
+        let startIndex = 0;
+        
+        while ((startIndex = textoNorm.indexOf(termo, startIndex)) > -1) {
           
-          if (Math.abs(distance) > 100) continue; // Distância máxima permitida
-          
-          // Penaliza números que aparecem DEPOIS do produto, preferindo os que vêm ANTES
-          let score = distance >= 0 ? distance : Math.abs(distance) * 2;
+          // Look-Behind: buscar número IMEDIATAMENTE ANTES do produto
+          const trechoAnterior = textoNorm.substring(0, startIndex);
+          const regexNumeroAntes = /(\b\d+(?:[.,]\d+)?)\s*(?:centos?\s+de\s+|centos?\s+|unidades?\s+de\s+|unidades?\s+|de\s+|x\s*)?$/i;
+          const matchNum = trechoAnterior.match(regexNumeroAntes);
 
-          if (score < minDistance) {
-            minDistance = score;
-            nearestNum = n;
+          let quantidade = 100; // Padrão se não achar número
+          let inicioSubstituicao = startIndex;
+
+          if (matchNum) {
+            quantidade = parseFloat(matchNum[1].replace(',', '.'));
+            if (matchNum[2] && /cento/i.test(matchNum[2])) {
+               quantidade *= 100; // Cliente pediu "1 cento de coxinha"
+            }
+            inicioSubstituicao = matchNum.index; // Vamos apagar desde o número
+          } else {
+            // Regra da Quantidade Implícita para Serviços/Taxas
+            const isServico = produto.unit === 'unidade' || produto.unit === 'unit' || (produto.category && produto.category.toLowerCase() === 'extras' && produto.name.toLowerCase().includes('fritura'));
+            if (isServico) {
+              quantidade = 1;
+            }
           }
-        }
 
-        let quantidade = 100; // Padrão se não achar número
-        if (nearestNum) {
-          quantidade = nearestNum.valor;
-          nearestNum.usado = true;
-        } else {
-          // Regra da Quantidade Implícita para Serviços/Taxas
-          const isServico = p.produto.unit === 'unidade' || p.produto.unit === 'unit' || (p.produto.category && p.produto.category.toLowerCase() === 'extras' && p.produto.name.toLowerCase().includes('fritura'));
-          if (isServico) {
-            quantidade = 1;
+          const id = produto.id;
+          if (consolidado.has(id)) {
+            consolidado.get(id).quantidade += quantidade;
+          } else {
+            consolidado.set(id, { produto, quantidade });
           }
-        }
 
-        const id = p.produto.id;
-        if (consolidado.has(id)) {
-          consolidado.get(id).quantidade += quantidade;
-        } else {
-          consolidado.set(id, { produto: p.produto, quantidade });
+          // PARSE DESTRUTIVO: Apaga o termo (e a quantidade associada) da string original!
+          const fimSubstituicao = startIndex + termo.length;
+          const tamanhoApagar = fimSubstituicao - inicioSubstituicao;
+          const espacos = ' '.repeat(tamanhoApagar);
+
+          textoNorm = textoNorm.substring(0, inicioSubstituicao) + espacos + textoNorm.substring(fimSubstituicao);
+          textoLimpo = textoLimpo.substring(0, inicioSubstituicao) + espacos + textoLimpo.substring(fimSubstituicao);
+
+          // Continua buscando a partir do fim da região apagada
+          startIndex = fimSubstituicao;
         }
       }
 
       const itensProcessados = [...consolidado.values()];
 
-      // 4. Identifica itens não reconhecidos (números que sobraram órfãos)
+      // Identifica itens não reconhecidos (números que sobraram órfãos no texto final esburacado)
+      const regexNumOrfao = /(\b\d+(?:[.,]\d+)?)\b/g;
       const naoReconhecidos = [];
-      for (const n of numeros) {
-        if (!n.usado) {
-          // Extrai o contexto ao redor do número órfão para feedback
-          const contexto = textoLimpo.substring(n.index, n.index + 35).replace(/\n/g, ' ').trim();
+      let matchOrfao;
+      while ((matchOrfao = regexNumOrfao.exec(textoNorm)) !== null) {
+          const contexto = textoLimpo.substring(matchOrfao.index, matchOrfao.index + 35).replace(/\n/g, ' ').trim();
           if (contexto.length > 3 && !/^(0|00|11)$/.test(contexto)) {
              naoReconhecidos.push(contexto + "...");
           }
-        }
       }
+
       if (itensProcessados.length === 0 && naoReconhecidos.length === 0) {
         mostrarFeedback('erro', '⚠️ Nenhum produto foi identificado. Verifique o formato do texto.');
         return;
