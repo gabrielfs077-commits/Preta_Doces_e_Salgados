@@ -232,17 +232,13 @@ const MAPA_IMAGENS_EXISTENTES = {
 
   // Salgados Fritos
   'aipim com carne de sol': 'Aipim com carne de sol.jpeg',
-  'aipim com queijo': 'Aipim com carne de sol.jpeg',
   'coxinha com catupiry': 'Coxinha.webp',
   'coxinha comum': 'Coxinha.webp',
   'kibe': 'Kibe comum.jpeg',
   'kibe com queijo': 'Kibe com queijo.jpeg',
-  'maravilha de milho com bacon': 'Maravilha de Queijo.jpeg',
-  'maravilha de queijo': 'Maravilha de Queijo.jpeg',
   'risoles de bacalhau': 'Risole de Bacalhau.jpeg',
   'risoles de camarão': 'Risole de Camarao.jpeg',
   'risoles de carne': 'Risole de Carne.jpeg',
-  'risoles de gorgonzola': 'Risole de Napolitano.jpeg',
   'risoles de milho': 'Risole de MIlho.jpeg',
   'risoles de presunto e queijo': 'Risole de Napolitano.jpeg',
 
@@ -251,7 +247,6 @@ const MAPA_IMAGENS_EXISTENTES = {
   'empadas de camarão': 'emp.camarao.webp',
   'empadas de frango': 'emp.frango.webp',
   'empadas de palmito': 'emp.frango.webp', // fallback
-  'empadas de queijo': 'emp.frango.webp', // fallback
   'enroladinho de queijo': 'enr.queijo.webp',
   'enroladinho de salsicha': 'enr.salsicha.webp',
   'pastel de forno - ricota/espinafre': 'Pasteldericota.webp',
