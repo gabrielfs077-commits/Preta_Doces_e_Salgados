@@ -152,8 +152,8 @@ const PRODUTOS = [
   { id: 85, name: 'Trufas de Maracuj\u00e1',                       price: 400.00, unit: 'cento', category: 'doces', subcategory: 'gourmet' },
 
   // --- BOLOS ---
-  { id: 103, name: 'Bolo de Chocolate',                price: 115.00, unit: 'kg', category: 'bolos', subcategory: 'tradicionais' },
-  { id: 104, name: 'Bolo de Cenoura',                  price: 115.00, unit: 'kg', category: 'bolos', subcategory: 'tradicionais' },
+  { id: 103, name: 'Bolo de Chocolate',                price: 120.00, unit: 'kg', category: 'bolos', subcategory: 'tradicionais' },
+  { id: 104, name: 'Bolo de Cenoura',                  price: 120.00, unit: 'kg', category: 'bolos', subcategory: 'tradicionais' },
   { id: 105, name: 'Bolo Red Velvet',                  price: 135.00, unit: 'kg', category: 'bolos', subcategory: 'especiais' },
   { id: 106, name: 'Bolo de Churros',                  price: 135.00, unit: 'kg', category: 'bolos', subcategory: 'especiais' },
   { id: 107, name: 'Bolo de Ninho com Nutella',        price: 145.00, unit: 'kg', category: 'bolos', subcategory: 'especiais' },
@@ -176,7 +176,7 @@ const PRODUTOS = [
 ];
 
 // Preço base do bolo por kg e configurações de bolo personalizado
-const PRECO_BOLO_POR_KG = 115.00;
+const PRECO_BOLO_POR_KG = 120.00;
 const OPCOES_BOLO = {
   PESO_MINIMO: 1.5,
   PRECO_CAIXA: 20.00,

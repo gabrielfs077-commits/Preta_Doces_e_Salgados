@@ -506,21 +506,6 @@ function renderMenuPage(abaAtiva, subAbaAtiva, carrinho, quantidades, boloPerson
 
   for (const grupo of gruposParaRenderizar) {
     if (grupo === 'bolos') {
-      const produtosBolo = PRODUTOS.filter(p => p.category === 'bolos');
-      if (produtosBolo.length > 0) {
-        const cardsHTML = produtosBolo.map(p => {
-          const qtd = obterQuantidadeExibicao(p);
-          return renderProdutoCard(p, qtd);
-        }).join('');
-
-        secoesHTML += `
-          <section class="secao-produto" id="secao-bolos">
-            <h2 class="secao-produto__titulo">Tipos de bolo</h2>
-            <div class="produtos-grid">${cardsHTML}</div>
-          </section>
-        `;
-      }
-
       secoesHTML += renderBoloPersonalizado(boloPersonalizado);
       continue;
     }
