@@ -135,6 +135,8 @@ body {
   background-color: var(--cor-fundo);
   color: var(--cor-texto);
   line-height: 1.6;
+  overscroll-behavior-y: none;
+  touch-action: pan-y;
   min-height: 100vh;
 }
 
