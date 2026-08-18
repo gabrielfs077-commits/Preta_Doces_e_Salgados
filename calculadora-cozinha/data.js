@@ -123,7 +123,7 @@ const PRODUTOS = [
   { id: 60, name: 'Chocopower Branco ou Preto',             price: 180.00, unit: 'cento', category: 'doces', subcategory: 'comuns' },
   { id: 61, name: 'Churros',                                price: 150.00, unit: 'cento', category: 'doces', subcategory: 'comuns' },
   { id: 62, name: 'Leite Ninho',                            price: 150.00, unit: 'cento', category: 'doces', subcategory: 'comuns', rankVendido: 'destaque' },
-  { id: 63, name: 'Olho de Sogra',                          price: 180.00, unit: 'cento', category: 'doces', subcategory: 'comuns' },
+  { id: 63, name: 'Olho de Sogra',                          price: 200.00, unit: 'cento', category: 'doces', subcategory: 'comuns' },
   { id: 64, name: 'Ouriço (brigadeiro branco na castanha de caju)', price: 150.00, unit: 'cento', category: 'doces', subcategory: 'comuns' },
   { id: 65, name: 'Surpresa de Uva',                        price: 180.00, unit: 'cento', category: 'doces', subcategory: 'comuns' },
 
@@ -133,7 +133,7 @@ const PRODUTOS = [
   { id: 68, name: 'Brigadeiro Branco',                      price: 250.00, unit: 'cento', category: 'doces', subcategory: 'caramelizados' },
   { id: 69, name: 'Brigadeiro Preto',                       price: 250.00, unit: 'cento', category: 'doces', subcategory: 'caramelizados' },
   { id: 70, name: 'Castanha do Par\u00e1',                         price: 260.00, unit: 'cento', category: 'doces', subcategory: 'caramelizados' },
-  { id: 71, name: 'Frutinhas',                              price: 250.00, unit: 'cento', category: 'doces', subcategory: 'caramelizados' },
+  { id: 71, name: 'Frutinhas',                              price: 300.00, unit: 'cento', category: 'doces', subcategory: 'caramelizados' },
   { id: 72, name: 'Nozes',                                  price: 300.00, unit: 'cento', category: 'doces', subcategory: 'caramelizados' },
   { id: 73, name: 'Olho de Sogra',                          price: 260.00, unit: 'cento', category: 'doces', subcategory: 'caramelizados' },
 
