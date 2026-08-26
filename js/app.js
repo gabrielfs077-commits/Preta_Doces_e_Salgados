@@ -604,6 +604,253 @@ function bindEventos() {
   document.addEventListener('submit', onDocSubmit);
 }
 
+// =========================================================
+// AUTOCOMPLETE SEARCH — Busca em Tempo Real com Dropdown
+// =========================================================
+
+/** Máximo de sugestões exibidas no dropdown */
+const AUTOCOMPLETE_MAX_RESULTADOS = 8;
+
+/**
+ * Normaliza um texto para busca: remove acentos e converte para minúsculas.
+ * Ex: "Catupirí" → "catupiri", "Maçã" → "maca"
+ */
+function normalizarParaBusca(texto) {
+  return texto
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+/**
+ * Busca produtos que correspondem ao termo digitado.
+ * Retorna array de produtos (max AUTOCOMPLETE_MAX_RESULTADOS).
+ * A busca é case insensitive e ignora acentos.
+ */
+function buscarSugestoes(termo) {
+  if (!termo || termo.trim().length < 2) return [];
+
+  const termoNorm = normalizarParaBusca(termo.trim());
+
+  const resultados = PRODUTOS.filter(p => {
+    const nomeNorm = normalizarParaBusca(p.name);
+    const descNorm = p.description ? normalizarParaBusca(p.description) : '';
+    return nomeNorm.includes(termoNorm) || descNorm.includes(termoNorm);
+  });
+
+  return resultados.slice(0, AUTOCOMPLETE_MAX_RESULTADOS);
+}
+
+/**
+ * Destaca no texto as partes que correspondem ao termo de busca.
+ * Retorna string HTML com <mark class="autocomplete-match"> envolvendo os trechos.
+ */
+function destacarTexto(texto, termo) {
+  if (!termo) return texto;
+
+  const termoNorm = normalizarParaBusca(termo);
+  const textoNorm = normalizarParaBusca(texto);
+
+  // Encontra a posição do match no texto normalizado
+  const inicio = textoNorm.indexOf(termoNorm);
+  if (inicio === -1) return texto;
+
+  // Aplica highlight na posição correspondente do texto original
+  const antes = texto.substring(0, inicio);
+  const match = texto.substring(inicio, inicio + termo.length);
+  const depois = texto.substring(inicio + termo.length);
+
+  return `${antes}<mark class="autocomplete-match">${match}</mark>${depois}`;
+}
+
+/**
+ * Retorna o label legível da categoria/subcategoria de um produto.
+ */
+function obterLabelCategoria(produto) {
+  const labels = {
+    salgados: '🥐 Salgado',
+    doces: '🍫 Doce',
+    bombons: '🍬 Bombom',
+    bolos: '🎂 Bolo',
+  };
+
+  const subLabels = {
+    folhados: 'Folhado',
+    fritos: 'Frito',
+    assados: 'Assado',
+    extras: 'Extra',
+    comuns: 'Comum',
+    caramelizados: 'Caramelizado',
+    gourmet: 'Gourmet',
+  };
+
+  let label = labels[produto.category] || produto.category;
+  if (produto.subcategory && subLabels[produto.subcategory]) {
+    label += ' · ' + subLabels[produto.subcategory];
+  }
+  return label;
+}
+
+/**
+ * Renderiza as sugestões dentro do dropdown de autocomplete.
+ * Se não há resultados, exibe mensagem "nenhum resultado".
+ */
+function renderizarSugestoesAutocomplete(resultados, termo) {
+  const dropdown = document.getElementById('autocomplete-dropdown');
+  if (!dropdown) return;
+
+  if (resultados.length === 0) {
+    dropdown.innerHTML = `
+      <div class="autocomplete-vazio">
+        Nenhum produto encontrado para "<strong>${termo}</strong>"
+      </div>
+    `;
+    dropdown.classList.add('autocomplete-dropdown--visivel');
+    return;
+  }
+
+  const itensHTML = resultados.map(produto => {
+    const nomeDestacado = destacarTexto(produto.name, termo);
+    const categoriaLabel = obterLabelCategoria(produto);
+    const precoFormatado = formatarMoeda(produto.price);
+    const unidade = produto.unit === 'cento' ? '/cento' : produto.unit === 'kg' ? '/kg' : '/un';
+    const imgSrc = produto.image || './img/placeholder.webp';
+
+    return `
+      <div
+        class="autocomplete-item"
+        data-autocomplete-id="${produto.id}"
+        role="option"
+        tabindex="-1"
+      >
+        <img
+          class="autocomplete-item__img"
+          src="${imgSrc}"
+          alt="${produto.name}"
+          loading="lazy"
+          onerror="this.onerror=null; this.src='./img/placeholder.webp';"
+        />
+        <div class="autocomplete-item__info">
+          <span class="autocomplete-item__nome">${nomeDestacado}</span>
+          <span class="autocomplete-item__categoria">${categoriaLabel}</span>
+        </div>
+        <span class="autocomplete-item__preco">${precoFormatado}${unidade}</span>
+      </div>
+    `;
+  }).join('');
+
+  dropdown.innerHTML = itensHTML;
+  dropdown.classList.add('autocomplete-dropdown--visivel');
+}
+
+/**
+ * Cria o elemento do dropdown de autocomplete no DOM (se não existir).
+ * O dropdown é adicionado dentro do #autocomplete-container.
+ */
+function criarDropdownAutocomplete() {
+  if (document.getElementById('autocomplete-dropdown')) return;
+
+  const container = document.getElementById('autocomplete-container');
+  if (!container) return;
+
+  const dropdown = document.createElement('div');
+  dropdown.id = 'autocomplete-dropdown';
+  dropdown.className = 'autocomplete-dropdown';
+  dropdown.setAttribute('role', 'listbox');
+  dropdown.setAttribute('aria-label', 'Sugestões de busca');
+
+  container.appendChild(dropdown);
+}
+
+/**
+ * Fecha o dropdown de autocomplete (com animação de saída).
+ */
+function fecharAutocomplete() {
+  const dropdown = document.getElementById('autocomplete-dropdown');
+  if (dropdown) {
+    dropdown.classList.remove('autocomplete-dropdown--visivel');
+  }
+}
+
+/**
+ * Manipula a seleção de uma sugestão do autocomplete:
+ * 1. Fecha o dropdown
+ * 2. Garante que a página é "menu" com aba "todos"
+ * 3. Faz scroll suave até o card do produto
+ * 4. Adiciona highlight temporário (2 segundos)
+ */
+function selecionarSugestaoAutocomplete(produtoId) {
+  // 1. Fecha o dropdown
+  fecharAutocomplete();
+
+  // 2. Limpa o input e atualiza estado
+  const searchInput = document.getElementById('site-search');
+  if (searchInput) {
+    searchInput.value = '';
+  }
+  appState.searchQuery = '';
+
+  // 3. Garantir que estamos na página de menu com aba "todos"
+  const precisaReRender = (
+    appState.paginaAtual !== 'menu' ||
+    appState.abaAtiva !== 'todos' ||
+    appState.subAbaAtiva !== 'todos'
+  );
+
+  if (precisaReRender) {
+    appState.paginaAtual = 'menu';
+    appState.abaAtiva = 'todos';
+    appState.subAbaAtiva = 'todos';
+    history.pushState({ pagina: 'menu' }, '', '#menu');
+    renderizar();
+  }
+
+  // 4. Scroll suave até o card e highlight temporário
+  // Usa setTimeout para garantir que o DOM foi atualizado após possível re-render
+  setTimeout(() => {
+    const cardEl = document.querySelector(`[data-produto-id="${produtoId}"]`);
+    if (!cardEl) return;
+
+    // Scroll suave até o card (centralizado na tela)
+    cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // Remove classe anterior caso exista (permite repetir o efeito)
+    cardEl.classList.remove('highlight-temporario');
+    cardEl.classList.remove('highlight');
+    void cardEl.offsetWidth; // Força reflow para reiniciar animação
+
+    // Adiciona highlight temporário
+    cardEl.classList.add('highlight-temporario');
+
+    // Remove a classe após 2 segundos
+    setTimeout(() => {
+      cardEl.classList.remove('highlight-temporario');
+    }, 2000);
+  }, precisaReRender ? 200 : 50);
+}
+
+/**
+ * Processa o evento de input no campo de busca para exibir sugestões.
+ * Chamada a cada tecla digitada (evento 'input').
+ */
+function processarInputAutocomplete(valor) {
+  const termo = valor.trim();
+
+  // Se o campo está vazio ou muito curto, fecha o dropdown
+  if (termo.length < 2) {
+    fecharAutocomplete();
+    return;
+  }
+
+  // Garante que o dropdown existe no DOM
+  criarDropdownAutocomplete();
+
+  // Busca sugestões e renderiza
+  const resultados = buscarSugestoes(termo);
+  renderizarSugestoesAutocomplete(resultados, termo);
+}
+
+// Função original refatorada para usar o novo sistema de highlight
 function executarBuscaEHighlight(query) {
   if (!query) return;
   const termo = query.toLowerCase().trim();
@@ -615,6 +862,9 @@ function executarBuscaEHighlight(query) {
   );
 
   if (produtoEncontrado) {
+    // Fecha o autocomplete caso esteja aberto
+    fecharAutocomplete();
+
     appState.searchQuery = query;
     appState.paginaAtual = 'menu';
     appState.abaAtiva = 'todos';
@@ -626,11 +876,12 @@ function executarBuscaEHighlight(query) {
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
         el.classList.remove('highlight');
+        el.classList.remove('highlight-temporario');
         void el.offsetWidth; // Força reflow
-        el.classList.add('highlight');
+        el.classList.add('highlight-temporario');
         setTimeout(() => {
-          el.classList.remove('highlight');
-        }, 2800);
+          el.classList.remove('highlight-temporario');
+        }, 2000);
       }
     }, 150);
   } else {
@@ -662,6 +913,15 @@ function onDocSubmit(e) {
 
 
 function onDocClick(e) {
+  // Clique numa sugestão do autocomplete
+  const sugestao = e.target.closest('[data-autocomplete-id]');
+  if (sugestao) {
+    e.preventDefault();
+    const produtoId = parseInt(sugestao.dataset.autocompleteId, 10);
+    selecionarSugestaoAutocomplete(produtoId);
+    return;
+  }
+
   if (e.target.closest('[data-acao="ir-home"]')) {
     e.preventDefault();
     voltarAoInicio();
@@ -875,6 +1135,12 @@ function onDocChange(e) {
 }
 
 function onDocInput(e) {
+  // Autocomplete: captura digitação no campo de busca
+  if (e.target.id === 'site-search') {
+    processarInputAutocomplete(e.target.value);
+    return;
+  }
+
   const boloInput = e.target.closest('[data-bolo]');
   if (boloInput) {
     const campo = boloInput.dataset.bolo;
@@ -919,11 +1185,21 @@ function inicializar() {
 
   renderizar();
 
-  // Fechar modal ou lightbox com tecla Escape
+  // Fechar modal, lightbox ou autocomplete com tecla Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      fecharAutocomplete();
       fecharCheckout();
       fecharLightbox();
+    }
+  });
+
+  // Fechar autocomplete ao clicar fora do dropdown
+  document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('autocomplete-dropdown');
+    const container = document.getElementById('autocomplete-container');
+    if (dropdown && container && !container.contains(e.target)) {
+      fecharAutocomplete();
     }
   });
 

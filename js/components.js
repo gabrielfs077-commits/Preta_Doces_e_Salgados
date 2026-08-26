@@ -101,26 +101,29 @@ function renderHeader(paginaAtual, totalItensCarrinho) {
     <!-- Contêiner Isolado da Barra de Busca (Irmão do header) -->
     <div class="header__search-container">
       <div class="container">
-        <form class="header__search" data-search-form>
-          <label class="sr-only" for="site-search">Pesquisar no site</label>
-          <div class="header__search-wrapper">
-            <span class="header__search-icon" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            </span>
-            <input
-              id="site-search"
-              name="search"
-              type="search"
-              class="header__search-input"
-              placeholder="Buscar produtos..."
-              autocomplete="off"
-              value="${appState.searchQuery || ''}"
-            />
-          </div>
-          <button type="submit" class="btn btn-search" aria-label="Pesquisar">
-            Buscar
-          </button>
-        </form>
+        <div class="autocomplete-container" id="autocomplete-container">
+          <form class="header__search" data-search-form>
+            <label class="sr-only" for="site-search">Pesquisar no site</label>
+            <div class="header__search-wrapper">
+              <span class="header__search-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              </span>
+              <input
+                id="site-search"
+                name="search"
+                type="search"
+                class="header__search-input"
+                placeholder="Buscar produtos..."
+                autocomplete="off"
+                value="${appState.searchQuery || ''}"
+              />
+            </div>
+            <button type="submit" class="btn btn-search" aria-label="Pesquisar">
+              Buscar
+            </button>
+          </form>
+          <!-- Dropdown de autocomplete é injetado aqui pelo JS -->
+        </div>
       </div>
     </div>
   `;
