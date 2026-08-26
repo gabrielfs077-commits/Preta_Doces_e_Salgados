@@ -451,7 +451,7 @@ a {
 }
 
 .btn-hero {
-  background: linear-gradient(135deg, var(--cor-header-inicio) 0%, var(--cor-rosa-escuro) 100%);
+  background: var(--cor-header-inicio);
   color: white;
   font-size: 1.05rem;
   padding: 0.85rem 2.2rem;
@@ -1880,6 +1880,18 @@ textarea.campo-input {
 /* =========================================================
    CARRINHO FLUTUANTE (BOTTOM BAR)
    ========================================================= */
+.floating-cart-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  background: var(--cor-header-inicio);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+  padding: 0.75rem 1rem;
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+}
+
 .carrinho-flutuante {
   position: fixed;
   bottom: 0;
@@ -1986,7 +1998,7 @@ textarea.campo-input {
 
 /* Espaço inferior para compensar a bottom bar fixa */
 body.tem-carrinho {
-  padding-bottom: 80px;
+  padding-bottom: 96px;
 }
 
 .cart-page__titulo-wrap {

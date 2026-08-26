@@ -739,7 +739,7 @@ function renderCartPage(carrinho) {
 function renderCarrinhoFlutuante(carrinho) {
   // Oculta a bottom bar se o carrinho estiver vazio ou se o usuário já estiver na aba do carrinho/checkout
   if (carrinho.length === 0 || (typeof appState !== 'undefined' && appState.paginaAtual === 'cart')) {
-    return `<div id="carrinho-flutuante" class="carrinho-flutuante carrinho-flutuante--oculto" aria-hidden="true"></div>`;
+    return `<div id="carrinho-flutuante" class="floating-cart-bar carrinho-flutuante carrinho-flutuante--oculto" aria-hidden="true"></div>`;
   }
 
   const totalItens = carrinho.reduce((acc, item) => acc + item.quantidade, 0);
@@ -747,7 +747,7 @@ function renderCarrinhoFlutuante(carrinho) {
   const qtdTexto = totalItens === 1 ? '1 item' : `${totalItens} itens`;
 
   return `
-    <div id="carrinho-flutuante" class="carrinho-flutuante" role="complementary" aria-label="Resumo do carrinho">
+    <div id="carrinho-flutuante" class="floating-cart-bar carrinho-flutuante" role="complementary" aria-label="Resumo do carrinho">
       <div class="carrinho-flutuante__info">
         <span class="carrinho-flutuante__icone">${ICONES.carrinho}</span>
         <div class="carrinho-flutuante__detalhes">
