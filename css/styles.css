@@ -2030,7 +2030,7 @@ body.tem-carrinho {
 .checkout-overlay {
   position: fixed;
   inset: 0;
-  z-index: 500;
+  z-index: 10000;
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -2182,6 +2182,28 @@ body.tem-carrinho {
   color: var(--cor-header-inicio);
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+.checkout-item__acoes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  flex-shrink: 0;
+}
+
+.checkout-item__remover {
+  padding: 0;
+  background: none;
+  color: var(--cor-vermelho);
+  font-family: var(--fonte-corpo);
+  font-size: 0.72rem;
+  text-decoration: underline;
+  text-underline-offset: 0.12rem;
+}
+
+.checkout-item__remover:hover {
+  color: #a52222;
 }
 
 /* Linha de total */

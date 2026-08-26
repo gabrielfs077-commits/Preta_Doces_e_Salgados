@@ -780,7 +780,7 @@ function renderCheckoutModal(carrinho) {
   const totalValor = calcularTotal(carrinho);
 
   // Resumo compacto dos itens
-  const resumoItens = carrinho.map(item => {
+  const resumoItens = carrinho.map((item, index) => {
     const subtotal = calcularSubtotal(item);
     const unidade = item.unit === 'cento' ? 'un' : item.unit;
     return `
@@ -789,7 +789,18 @@ function renderCheckoutModal(carrinho) {
           <span class="checkout-item__nome">${item.name}</span>
           <span class="checkout-item__qtd">${item.quantidade} ${unidade}</span>
         </div>
-        <span class="checkout-item__preco">${formatarMoeda(subtotal)}</span>
+        <div class="checkout-item__acoes">
+          <span class="checkout-item__preco">${formatarMoeda(subtotal)}</span>
+          <button
+            class="checkout-item__remover"
+            data-acao="remover-carrinho"
+            data-index="${index}"
+            type="button"
+            aria-label="Remover ${item.name}"
+          >
+            Remover
+          </button>
+        </div>
       </div>
     `;
   }).join('');
@@ -819,9 +830,6 @@ function renderCheckoutModal(carrinho) {
               <span class="checkout-total-label">Total (${totalItens} ${totalItens === 1 ? 'item' : 'itens'})</span>
               <span class="checkout-total-valor">${formatarMoeda(totalValor)}</span>
             </div>
-            <button class="checkout-editar-btn" data-nav="menu" id="btn-editar-pedido">
-              Editar Pedido
-            </button>
           </section>
 
           <!-- Formulário de Dados -->
@@ -829,12 +837,12 @@ function renderCheckoutModal(carrinho) {
             <h3 class="checkout-secao__titulo">Dados para Retirada</h3>
 
             <div class="checkout-campo">
-              <label class="checkout-campo__label" for="checkout-nome">Nome completo *</label>
+              <label class="checkout-campo__label" for="checkout-nome">Seu nome *</label>
               <input
                 id="checkout-nome"
                 type="text"
                 class="campo-input"
-                placeholder="Seu nome completo"
+                placeholder="Ex: João ou João Silva"
                 required
                 autocomplete="name"
               />
@@ -860,6 +868,7 @@ function renderCheckoutModal(carrinho) {
                 ${horariosHTML}
               </select>
               <span class="checkout-campo__erro" id="erro-horario" aria-live="polite"></span>
+            </div>
             <div class="checkout-campo">
               <label class="checkout-campo__label" for="checkout-contato">WhatsApp (Opcional)</label>
               <input
