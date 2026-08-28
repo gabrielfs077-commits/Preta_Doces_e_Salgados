@@ -680,11 +680,37 @@ function renderCheckoutModal(carrinho) {
   const resumoItens = carrinho.map((item, index) => {
     const subtotal = calcularSubtotal(item);
     const unidade = item.unit === 'cento' ? 'un' : item.unit;
+    const step = item.unit === 'cento' ? 25 : 1;
+    const min  = item.unit === 'cento' ? 25 : 1;
+    const isBolo = !!(item.isBolo || (item.id && item.id.toString().startsWith('bolo')));
     return `
       <div class="checkout-item">
         <div class="checkout-item__info">
           <span class="checkout-item__nome">${item.name}</span>
-          <span class="checkout-item__qtd">${item.quantidade} ${unidade}</span>
+          ${isBolo
+            ? `<span class="checkout-item__qtd">${item.quantidade} ${unidade}</span>`
+            : `<div class="checkout-item__qtd-controle">
+                <button
+                  class="checkout-qtd-btn"
+                  data-acao="checkout-diminuir"
+                  data-index="${index}"
+                  data-step="${step}"
+                  data-min="${min}"
+                  type="button"
+                  aria-label="Diminuir quantidade"
+                  ${item.quantidade <= min ? 'disabled' : ''}
+                >${ICONES.menos}</button>
+                <span class="checkout-qtd-display">${item.quantidade} ${unidade}</span>
+                <button
+                  class="checkout-qtd-btn"
+                  data-acao="checkout-aumentar"
+                  data-index="${index}"
+                  data-step="${step}"
+                  type="button"
+                  aria-label="Aumentar quantidade"
+                >${ICONES.mais}</button>
+              </div>`
+          }
         </div>
         <div class="checkout-item__acoes">
           <span class="checkout-item__preco">${formatarMoeda(subtotal)}</span>

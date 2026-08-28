@@ -1046,6 +1046,55 @@ function onDocClick(e) {
     return;
   }
 
+  // Ajustar quantidade no modal de checkout (+/-)
+  const checkoutQtdBtn = e.target.closest('[data-acao="checkout-aumentar"], [data-acao="checkout-diminuir"]');
+  if (checkoutQtdBtn) {
+    const index = parseInt(checkoutQtdBtn.dataset.index, 10);
+    const step  = parseInt(checkoutQtdBtn.dataset.step, 10) || 1;
+    const min   = parseInt(checkoutQtdBtn.dataset.min, 10) || 1;
+    const acao  = checkoutQtdBtn.dataset.acao;
+    const item  = appState.carrinho[index];
+    if (!item) return;
+
+    if (acao === 'checkout-aumentar') {
+      item.quantidade += step;
+    } else {
+      const novaQtd = item.quantidade - step;
+      if (novaQtd < min) {
+        // Quantidade abaixo do mínimo → remove o item
+        removerDoCarrinho(index);
+        return;
+      }
+      item.quantidade = novaQtd;
+    }
+
+    // Sincroniza o estado de quantidades
+    if (item.id) {
+      appState.quantidades[item.id] = item.quantidade;
+    }
+    salvarEstado();
+
+    // Re-renderiza o modal com dados atualizados
+    const overlay = document.getElementById('checkout-overlay');
+    if (overlay && overlay.classList.contains('checkout-overlay--ativo')) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = renderCheckoutModal(appState.carrinho);
+      const novoModal = tempDiv.firstElementChild;
+      overlay.replaceWith(novoModal);
+      const novoOverlay = document.getElementById('checkout-overlay');
+      if (novoOverlay) {
+        requestAnimationFrame(() => {
+          novoOverlay.classList.add('checkout-overlay--ativo');
+        });
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    // Atualiza sidebar, header, bottom bar
+    atualizarCarrinhoUI();
+    return;
+  }
+
   // Adicionar ao carrinho
   const addBtn = e.target.closest('[data-acao="adicionar-carrinho"]');
   if (addBtn) {

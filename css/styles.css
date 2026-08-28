@@ -2206,6 +2206,59 @@ body.tem-carrinho {
   color: #a52222;
 }
 
+/* Controles de quantidade no checkout */
+.checkout-item__qtd-controle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+
+.checkout-qtd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--cor-card-borda);
+  background: var(--cor-fundo-alt);
+  color: var(--cor-header-inicio);
+  cursor: pointer;
+  transition: all var(--transicao);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.checkout-qtd-btn:hover:not(:disabled) {
+  background: var(--cor-rosa);
+  color: white;
+  border-color: var(--cor-rosa);
+}
+
+.checkout-qtd-btn:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+.checkout-qtd-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.checkout-qtd-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.checkout-qtd-display {
+  font-family: var(--fonte-titulo);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cor-texto);
+  min-width: 3rem;
+  text-align: center;
+}
+
 /* Linha de total */
 .checkout-total-linha {
   display: flex;
