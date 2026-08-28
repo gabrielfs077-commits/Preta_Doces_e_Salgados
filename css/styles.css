@@ -2229,6 +2229,34 @@ body.tem-carrinho {
   color: var(--cor-header-inicio);
 }
 
+/* Botão Limpar Carrinho (dentro do modal de checkout) */
+.checkout-limpar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: 1px dashed var(--cor-texto-suave);
+  color: var(--cor-texto-suave);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-full);
+  font-family: var(--fonte-corpo);
+  font-size: 0.75rem;
+  cursor: pointer;
+  margin-top: 0.65rem;
+  transition: all var(--transicao);
+  min-height: 34px;
+}
+
+.checkout-limpar-btn:hover {
+  border-color: var(--cor-vermelho);
+  color: var(--cor-vermelho);
+  background: var(--cor-vermelho-claro);
+}
+
+.checkout-limpar-btn:active {
+  transform: scale(0.95);
+}
+
 /* Botão editar pedido */
 .checkout-editar-btn {
   display: inline-flex;

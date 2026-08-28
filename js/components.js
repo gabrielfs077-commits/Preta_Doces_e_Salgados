@@ -76,8 +76,8 @@ function renderHeader(paginaAtual, totalItensCarrinho) {
 
               <!-- Carrinho -->
               <button
-                class="nav-btn nav-btn--carrinho ${paginaAtual === 'cart' ? 'ativo' : ''}"
-                data-nav="cart"
+                class="nav-btn nav-btn--carrinho"
+                data-acao="abrir-checkout"
                 aria-label="Carrinho de compras com ${totalItensCarrinho} itens"
               >
                 ${ICONES.carrinho}
@@ -394,7 +394,7 @@ function renderCartSidebar(carrinho) {
           <span class="cart-sidebar__total-label">Total</span>
           <span class="cart-sidebar__total-valor">${formatarMoeda(calcularTotal(carrinho))}</span>
         </div>
-        <button class="btn btn-primario btn-full" data-nav="cart" id="btn-sidebar-finalizar">
+        <button class="btn btn-primario btn-full" data-acao="abrir-checkout" id="btn-sidebar-finalizar">
           Finalizar Pedido →
         </button>
       </div>
@@ -625,120 +625,17 @@ function renderMenuPage(abaAtiva, subAbaAtiva, carrinho, quantidades, boloPerson
 }
 
 // =========================================================
-// CART PAGE
+// CART PAGE — REMOVIDA (Single Page Checkout)
+// Todo o fluxo de carrinho agora é feito exclusivamente
+// pelo Modal de Checkout (renderCheckoutModal).
 // =========================================================
-function renderCartPage(carrinho) {
-
-  if (carrinho.length === 0) {
-    return `
-      <main class="cart-page" id="pagina-cart">
-        <div class="cart-page__topo">
-          <div class="container">
-            <h2 class="cart-page__titulo">Seu Carrinho</h2>
-          </div>
-        </div>
-        <div class="container">
-          <div class="cart-vazio">
-            <div class="cart-vazio__icone">${ICONES.sacola}</div>
-            <h3 class="cart-vazio__titulo">Seu carrinho está vazio</h3>
-            <p>Adicione produtos deliciosos do nosso cardápio!</p>
-            <br>
-            <button class="btn btn-primario" data-nav="menu" id="btn-ir-cardapio" style="margin-top:1rem;">
-              Ver Cardápio
-            </button>
-          </div>
-        </div>
-      </main>
-    `;
-  }
-
-  const itensHTML = carrinho.map((item, index) => {
-    const subtotal = calcularSubtotal(item);
-    const unidade  = item.unit === 'cento' ? 'unidades' : item.unit;
-    return `
-      <div class="cart-item-card">
-        <img
-          class="cart-item-card__img"
-          src="${item.image}"
-          alt="${item.name}"
-          loading="lazy"
-          onerror="this.onerror=null; this.src='./img/placeholder.webp';"
-        />
-        <div class="cart-item-card__info">
-          <div class="cart-item-card__nome">${item.name}</div>
-          ${item.description ? `<div class="cart-item-card__desc">${item.description}</div>` : ''}
-          <div class="cart-item-card__qtd">Quantidade: ${item.quantidade} ${unidade}</div>
-        </div>
-        <div class="cart-item-card__preco-area">
-          <div class="cart-item-card__preco">${formatarMoeda(subtotal)}</div>
-          <button class="btn-remover" data-acao="remover-carrinho" data-index="${index}" aria-label="Remover ${item.name}" style="margin-top:0.5rem;">
-            Remover
-          </button>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  return `
-    <main class="cart-page" id="pagina-cart">
-      <div class="cart-page__topo">
-        <div class="container">
-          <div class="cart-page__titulo-wrap">
-            <h2 class="cart-page__titulo">Seu Carrinho</h2>
-          </div>
-        </div>
-      </div>
-      <div class="container">
-        <div class="cart-page__conteudo">
-
-          <!-- Itens -->
-          <section aria-label="Itens do carrinho">
-            ${itensHTML}
-          </section>
-
-          <div class="cart-page__limpar-area">
-            <button class="cart-page__limpar-btn" data-acao="limpar-carrinho" type="button">
-              <span class="cart-page__limpar-icone">🗑️</span>
-              Limpar Carrinho
-            </button>
-          </div>
-
-          <!-- Total e finalização -->
-          <div class="total-card">
-            <div class="total-card__linha">
-              <span class="total-card__label">Total do Pedido</span>
-              <span class="total-card__valor">${formatarMoeda(calcularTotal(carrinho))}</span>
-            </div>
-            <button
-              class="btn btn-wpp btn-full"
-              data-acao="abrir-checkout"
-              id="btn-finalizar-cart"
-              style="font-size:1rem; padding:1rem;"
-            >
-              Avançar para Dados do Pedido →
-            </button>
-            <button
-              class="btn btn-outline btn-full"
-              data-nav="menu"
-              id="btn-continuar-comprando"
-              style="margin-top:0.75rem; font-size:0.9rem;"
-            >
-              ← Continuar Comprando
-            </button>
-          </div>
-
-        </div>
-      </div>
-    </main>
-  `;
-}
 
 // =========================================================
 // CARRINHO FLUTUANTE (BOTTOM BAR MOBILE)
 // =========================================================
 function renderCarrinhoFlutuante(carrinho) {
-  // Oculta a bottom bar se o carrinho estiver vazio ou se o usuário já estiver na aba do carrinho/checkout
-  if (carrinho.length === 0 || (typeof appState !== 'undefined' && appState.paginaAtual === 'cart')) {
+  // Oculta a bottom bar se o carrinho estiver vazio
+  if (carrinho.length === 0) {
     return `<div id="carrinho-flutuante" class="floating-cart-bar carrinho-flutuante carrinho-flutuante--oculto" aria-hidden="true"></div>`;
   }
 
@@ -755,8 +652,8 @@ function renderCarrinhoFlutuante(carrinho) {
           <span class="carrinho-flutuante__total">${formatarMoeda(totalValor)}</span>
         </div>
       </div>
-      <button class="carrinho-flutuante__btn" data-nav="cart" id="btn-carrinho-flutuante">
-        Revisar Pedido →
+      <button class="carrinho-flutuante__btn" data-acao="abrir-checkout" id="btn-carrinho-flutuante">
+        Finalizar Pedido →
       </button>
     </div>
   `;
@@ -830,6 +727,9 @@ function renderCheckoutModal(carrinho) {
               <span class="checkout-total-label">Total (${totalItens} ${totalItens === 1 ? 'item' : 'itens'})</span>
               <span class="checkout-total-valor">${formatarMoeda(totalValor)}</span>
             </div>
+            <button class="checkout-limpar-btn" data-acao="limpar-carrinho" type="button" aria-label="Limpar carrinho">
+              🗑️ Limpar Carrinho
+            </button>
           </section>
 
           <!-- Formulário de Dados -->

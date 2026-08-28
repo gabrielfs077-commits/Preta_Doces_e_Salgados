@@ -10,7 +10,7 @@
 // ESTADO GLOBAL DA APLICAÇÃO
 // =========================================================
 const appState = {
-  paginaAtual: 'home',       // 'home' | 'menu' | 'cart' | 'contact'
+  paginaAtual: 'home',       // 'home' | 'menu' | 'contact'
   abaAtiva:    'todos',      // 'todos' | 'salgados' | 'doces' | 'bombons' | 'bolos'
   subAbaAtiva: 'todos',      // 'todos' | 'folhados' | 'fritos' | etc
   carrinho:    [],           // [{ ...produto, quantidade }]
@@ -136,9 +136,6 @@ function renderizar() {
       break;
     case 'menu':
       paginaHTML = renderMenuPage(abaAtiva, subAbaAtiva, carrinho, quantidades, boloPersonalizado, appState.searchQuery);
-      break;
-    case 'cart':
-      paginaHTML = renderCartPage(carrinho);
       break;
     case 'contact':
       paginaHTML = renderContactPage();
@@ -284,9 +281,38 @@ function removerDoCarrinho(index) {
 
   salvarEstado();
 
-  // Se estiver na página de carrinho ou menu (quando remove pela sidebar), re-renderiza
-  if (appState.paginaAtual === 'cart' || appState.paginaAtual === 'menu') {
-    renderizar();
+  // Se o carrinho ficou vazio e o modal está aberto, fecha automaticamente
+  if (appState.carrinho.length === 0) {
+    fecharCheckout();
+    // Re-renderiza para atualizar sidebar, header, etc.
+    if (appState.paginaAtual === 'menu') {
+      renderizar();
+    } else {
+      atualizarCarrinhoUI();
+    }
+    return;
+  }
+
+  // Se o modal de checkout está aberto, re-renderiza o modal com dados atualizados
+  const overlay = document.getElementById('checkout-overlay');
+  if (overlay && overlay.classList.contains('checkout-overlay--ativo')) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = renderCheckoutModal(appState.carrinho);
+    const novoModal = tempDiv.firstElementChild;
+    overlay.replaceWith(novoModal);
+    // Reativa o modal imediatamente
+    const novoOverlay = document.getElementById('checkout-overlay');
+    if (novoOverlay) {
+      requestAnimationFrame(() => {
+        novoOverlay.classList.add('checkout-overlay--ativo');
+      });
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  // Atualiza sidebar, header, bottom bar
+  if (appState.paginaAtual === 'menu') {
+    atualizarCarrinhoUI();
   } else {
     atualizarCarrinhoUI();
   }
@@ -935,6 +961,11 @@ function onDocClick(e) {
     if (alvo.closest('.checkout-overlay')) {
       fecharCheckout();
     }
+    // Intercepta navegação para 'cart' — abre checkout direto (Single Page Checkout)
+    if (pagina === 'cart') {
+      abrirCheckout();
+      return;
+    }
     navegarPara(pagina);
     return;
   }
@@ -1068,7 +1099,7 @@ function onDocClick(e) {
     salvarEstado();
     fecharCheckout();
     atualizarCarrinhoUI();
-    if (appState.paginaAtual === 'cart' || appState.paginaAtual === 'menu') {
+    if (appState.paginaAtual === 'menu') {
       renderizar();
     }
     mostrarToast('Carrinho esvaziado.', 'sucesso');
@@ -1178,7 +1209,7 @@ function inicializar() {
 
   // Detecta página pela URL hash (ex: #menu ao recarregar)
   const hash = window.location.hash.replace('#', '');
-  const paginasValidas = ['home', 'menu', 'cart', 'contact'];
+  const paginasValidas = ['home', 'menu', 'contact'];
   if (paginasValidas.includes(hash)) {
     appState.paginaAtual = hash;
   }
@@ -1225,17 +1256,3 @@ if (document.readyState === 'loading') {
   inicializar();
 }
 
-// =========================================================
-// FIX: EVENT DELEGATION GLOBAL (BOTTOM BAR)
-// =========================================================
-// O ouvinte global no body garante que o botão Finalizar Pedido da Bottom Bar
-// funcione perfeitamente independentemente de re-renderizações ou ciclo de vida.
-document.body.addEventListener('click', function(e) {
-  const bottomBarBtn = e.target.closest('.carrinho-flutuante__btn') || e.target.closest('#btn-carrinho-flutuante');
-  if (bottomBarBtn) {
-    e.preventDefault();
-    if (typeof abrirCheckout === 'function') {
-      abrirCheckout();
-    }
-  }
-});
