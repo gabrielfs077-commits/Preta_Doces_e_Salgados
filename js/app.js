@@ -584,7 +584,10 @@ function validarCheckout() {
   return valido;
 }
 
-function finalizarPedidoWhatsApp() {
+function finalizarPedidoWhatsApp(e) {
+  // Previne reload acidental caso a função seja chamada a partir de um form/submit
+  if (e && e.preventDefault) e.preventDefault();
+
   if (!validarCheckout()) return;
 
   const nome    = document.getElementById('checkout-nome').value.trim();
@@ -592,20 +595,35 @@ function finalizarPedidoWhatsApp() {
   const horario = document.getElementById('checkout-horario').value;
 
   const mensagem = gerarMensagemWhatsApp(nome, data, horario);
-  window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${mensagem}`, '_blank');
+  const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${mensagem}`;
 
-  // Limpar carrinho após o envio bem-sucedido
-  appState.carrinho = [];
-  appState.quantidades = {};
-  salvarEstado();
+  // Detecta iOS (iPhone, iPad, iPod) para contornar o bloqueio de pop-ups do Safari
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-  fecharCheckout();
-  mostrarToast('Pedido enviado com sucesso!', 'sucesso');
+  if (isIOS) {
+    // No iOS/Safari, window.open é bloqueado pelo bloqueador de pop-ups.
+    // Navegação direta não é interceptada.
+    window.location.href = url;
+  } else {
+    // No Android, Desktop, etc., window.open com _blank funciona perfeitamente.
+    window.open(url, '_blank');
+  }
 
-  // Navega para home após envio
+  // Atrasa a limpeza do carrinho para garantir que o redirecionamento
+  // (especialmente no iOS via location.href) aconteça ANTES da UI mostrar "carrinho vazio".
   setTimeout(() => {
-    navegarPara('home');
-  }, 800);
+    appState.carrinho = [];
+    appState.quantidades = {};
+    salvarEstado();
+
+    fecharCheckout();
+    mostrarToast('Pedido enviado com sucesso!', 'sucesso');
+
+    // Navega para home após envio
+    setTimeout(() => {
+      navegarPara('home');
+    }, 800);
+  }, 1500);
 }
 
 // =========================================================
@@ -1116,7 +1134,8 @@ function onDocClick(e) {
 
   // Finalizar pedido via WhatsApp (acionado diretamente da página de Cart)
   if (e.target.closest('#btn-enviar-whatsapp') || e.target.closest('#btn-finalizar-wpp')) {
-    finalizarPedidoWhatsApp();
+    e.preventDefault();
+    finalizarPedidoWhatsApp(e);
     return;
   }
 
@@ -1158,7 +1177,7 @@ function onDocClick(e) {
   // Enviar pedido pelo modal de checkout
   if (e.target.closest('[data-acao="enviar-checkout"]')) {
     e.preventDefault();
-    finalizarPedidoWhatsApp();
+    finalizarPedidoWhatsApp(e);
     return;
   }
 
