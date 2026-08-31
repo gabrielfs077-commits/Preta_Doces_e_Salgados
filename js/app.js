@@ -333,7 +333,7 @@ function adicionarBoloAoCarrinho() {
   }
 
   const pesoNum = Math.max(OPCOES_BOLO.PESO_MINIMO, parseFloat(peso) || OPCOES_BOLO.PESO_MINIMO);
-  const precoTotal = (pesoNum * PRECO_BOLO_POR_KG) + (caixaTransporte ? OPCOES_BOLO.PRECO_CAIXA : 0);
+  const precoTotal = calcularPrecoBolo(pesoNum, caixaTransporte);
 
   const detalhesArr = [
     `Massa: ${sabor}`,
@@ -585,9 +585,6 @@ function validarCheckout() {
 }
 
 function finalizarPedidoWhatsApp(e) {
-  // Previne reload acidental caso a função seja chamada a partir de um form/submit
-  if (e && e.preventDefault) e.preventDefault();
-
   if (!validarCheckout()) return;
 
   const nome    = document.getElementById('checkout-nome').value.trim();
@@ -597,17 +594,8 @@ function finalizarPedidoWhatsApp(e) {
   const mensagem = gerarMensagemWhatsApp(nome, data, horario);
   const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${mensagem}`;
 
-  // Detecta iOS (iPhone, iPad, iPod) para contornar o bloqueio de pop-ups do Safari
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-  if (isIOS) {
-    // No iOS/Safari, window.open é bloqueado pelo bloqueador de pop-ups.
-    // Navegação direta não é interceptada.
-    window.location.href = url;
-  } else {
-    // No Android, Desktop, etc., window.open com _blank funciona perfeitamente.
-    window.open(url, '_blank');
-  }
+  // Usa a função global que detecta iOS/Android automaticamente
+  abrirWhatsApp(url);
 
   // Atrasa a limpeza do carrinho para garantir que o redirecionamento
   // (especialmente no iOS via location.href) aconteça ANTES da UI mostrar "carrinho vazio".
@@ -627,16 +615,31 @@ function finalizarPedidoWhatsApp(e) {
 }
 
 // =========================================================
+// WHATSAPP — ABERTURA COM DETECÇÃO iOS
+// Função global reutilizada por todos os botões de WhatsApp do site.
+// =========================================================
+function abrirWhatsApp(url) {
+  if (!url) url = `https://wa.me/${WHATSAPP_NUMERO}`;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  if (isIOS) {
+    window.location.href = url;
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
+// =========================================================
 // DELEGAÇÃO DE EVENTOS (Event Delegation)
-// Tudo vinculado ao documento — eficiente e sobrevive a re-renders parciais
+// Tudo vinculado ao documento — eficiente e sobrevive a re-renders parciais.
+// O antigo onDocTouchStart foi removido: causava preventDefault() em
+// touchstart que bloqueava scroll/zoom e disparava click duplicado.
+// A responsividade de toque é agora tratada via CSS (touch-action: manipulation).
 // =========================================================
 function bindEventos() {
   // Remove listeners antigos para evitar duplicação
   document.removeEventListener('click', onDocClick);
   document.addEventListener('click', onDocClick);
-
-  document.removeEventListener('touchstart', onDocTouchStart);
-  document.addEventListener('touchstart', onDocTouchStart, { passive: false });
 
   document.removeEventListener('change', onDocChange);
   document.addEventListener('change', onDocChange);
@@ -933,25 +936,25 @@ function executarBuscaEHighlight(query) {
   }
 }
 
-function onDocTouchStart(e) {
-  const alvo = e.target.closest('[data-acao="ir-home"], [data-nav], [data-acao="abrir-checkout"], [data-acao="limpar-carrinho"], [data-acao="enviar-checkout"], #btn-carrinho-flutuante');
-  if (!alvo) return;
-
-  e.preventDefault();
-  onDocClick(e);
-}
-
 function onDocSubmit(e) {
-  const form = e.target.closest('[data-search-form]');
-  if (!form) return;
+  // Submit do formulário de busca
+  const searchForm = e.target.closest('[data-search-form]');
+  if (searchForm) {
+    e.preventDefault();
+    const input = searchForm.querySelector('input[name="search"]');
+    const query = input?.value?.trim() || '';
+    if (query) {
+      executarBuscaEHighlight(query);
+    }
+    return;
+  }
 
-  e.preventDefault();
-
-  const input = form.querySelector('input[name="search"]');
-  const query = input?.value?.trim() || '';
-
-  if (query) {
-    executarBuscaEHighlight(query);
+  // Submit do formulário de checkout (Enter no teclado ou botão submit)
+  const checkoutForm = e.target.closest('[data-form-checkout]');
+  if (checkoutForm) {
+    e.preventDefault();
+    finalizarPedidoWhatsApp(e);
+    return;
   }
 }
 
@@ -969,6 +972,13 @@ function onDocClick(e) {
   if (e.target.closest('[data-acao="ir-home"]')) {
     e.preventDefault();
     voltarAoInicio();
+    return;
+  }
+
+  // Abrir WhatsApp (botões de contato genéricos)
+  if (e.target.closest('[data-acao="abrir-whatsapp"]')) {
+    e.preventDefault();
+    abrirWhatsApp();
     return;
   }
 
@@ -1225,9 +1235,10 @@ function onDocChange(e) {
     // Atualiza display do preço do bolo em tempo real
     const displayPreco = document.getElementById('bolo-preco-display');
     if (displayPreco) {
-      const peso = Number(appState.boloPersonalizado.peso) || OPCOES_BOLO.PESO_MINIMO;
-      const precoTotal = (peso * PRECO_BOLO_POR_KG) + (appState.boloPersonalizado.caixaTransporte ? OPCOES_BOLO.PRECO_CAIXA : 0);
-      displayPreco.textContent = formatarMoeda(precoTotal);
+      displayPreco.textContent = formatarMoeda(calcularPrecoBolo(
+        appState.boloPersonalizado.peso,
+        appState.boloPersonalizado.caixaTransporte
+      ));
     }
     return;
   }
@@ -1256,9 +1267,10 @@ function onDocInput(e) {
 
     const displayPreco = document.getElementById('bolo-preco-display');
     if (displayPreco) {
-      const peso = Number(appState.boloPersonalizado.peso) || OPCOES_BOLO.PESO_MINIMO;
-      const precoTotal = (peso * PRECO_BOLO_POR_KG) + (appState.boloPersonalizado.caixaTransporte ? OPCOES_BOLO.PRECO_CAIXA : 0);
-      displayPreco.textContent = formatarMoeda(precoTotal);
+      displayPreco.textContent = formatarMoeda(calcularPrecoBolo(
+        appState.boloPersonalizado.peso,
+        appState.boloPersonalizado.caixaTransporte
+      ));
     }
   }
 }
@@ -1303,16 +1315,20 @@ function inicializar() {
   });
 
   // Mostrar/ocultar botão Voltar ao Topo ao rolar a página
+  // Usa requestAnimationFrame para throttle — evita jank em scroll rápido no mobile.
+  let scrollTicking = false;
   window.addEventListener('scroll', () => {
-    const btnTopo = document.getElementById('btn-voltar-topo');
-    if (btnTopo) {
-      if (window.scrollY > 300) {
-        btnTopo.classList.add('btn-voltar-topo--visivel');
-      } else {
-        btnTopo.classList.remove('btn-voltar-topo--visivel');
-      }
+    if (!scrollTicking) {
+      requestAnimationFrame(() => {
+        const btnTopo = document.getElementById('btn-voltar-topo');
+        if (btnTopo) {
+          btnTopo.classList.toggle('btn-voltar-topo--visivel', window.scrollY > 300);
+        }
+        scrollTicking = false;
+      });
+      scrollTicking = true;
     }
-  });
+  }, { passive: true });
 
   console.info('✅ Preta Doces e Salgados — Vanilla JS carregado com sucesso!');
 }

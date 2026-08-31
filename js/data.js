@@ -48,6 +48,9 @@ const SUBCATEGORIAS = {
 };
 
 // Catálogo completo de produtos
+// NOTA SOBRE IDs: A numeração possui gaps intencionais (ex: 38→100, 85→86, 99→100).
+// Isso ocorre porque IDs foram adicionados em momentos diferentes.
+// NÃO renumerar — quebraria carrinhos salvos no localStorage dos clientes.
 const PRODUTOS = [
   // --- SALGADOS FOLHADOS ---
   { id: 1,  name: 'Alho Poró \u2013 Creme Cheese',             price: 84.00,  unit: 'cento', category: 'salgados', subcategory: 'folhados', rankVendido: 'top5', ranking: 3 },
@@ -198,6 +201,14 @@ const OPCOES_BOLO = {
     'Chantilly com Morango'
   ]
 };
+
+/** Calcula o preço total de um bolo personalizado.
+ *  Centraliza a lógica que antes estava duplicada em 3 pontos do código.
+ */
+function calcularPrecoBolo(peso, caixaTransporte) {
+  const pesoNum = Math.max(OPCOES_BOLO.PESO_MINIMO, parseFloat(peso) || OPCOES_BOLO.PESO_MINIMO);
+  return (pesoNum * PRECO_BOLO_POR_KG) + (caixaTransporte ? OPCOES_BOLO.PRECO_CAIXA : 0);
+}
 
 // Número de WhatsApp para contato
 const WHATSAPP_NUMERO = '5561992552565';

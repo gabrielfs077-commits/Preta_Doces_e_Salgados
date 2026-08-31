@@ -136,7 +136,7 @@ body {
   color: var(--cor-texto);
   line-height: 1.6;
   overscroll-behavior-y: none;
-  touch-action: pan-y;
+  touch-action: manipulation; /* Permite scroll + zoom por pinch, elimina delay de 300ms */
   min-height: 100vh;
 }
 
@@ -158,6 +158,26 @@ input, select, textarea {
   font-family: inherit;
   font-size: 1rem;
   min-width: 0;
+}
+
+/*
+ * touch-action: manipulation em elementos interativos.
+ * Elimina o delay de 300ms do toque em iOS/Android sem bloquear
+ * scroll ou zoom (substitui o antigo onDocTouchStart do JS).
+ */
+button,
+a,
+[data-nav],
+[data-acao],
+[data-aba],
+[data-subaba],
+.filtro-btn,
+.filtro-sub-btn,
+.nav-btn,
+.btn-quantidade,
+.btn-add-mini,
+.autocomplete-item {
+  touch-action: manipulation;
 }
 
 a {

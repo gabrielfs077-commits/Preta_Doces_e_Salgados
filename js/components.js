@@ -170,7 +170,7 @@ function renderHomePage() {
             <button class="btn btn-hero" data-nav="menu" id="btn-ver-cardapio">
               ${ICONES.carrinho} Ver Cardápio Completo
             </button>
-            <button class="btn btn-wpp" onclick="window.open('https://wa.me/${WHATSAPP_NUMERO}', '_blank')" id="btn-contato-hero">
+            <button class="btn btn-wpp" data-acao="abrir-whatsapp" id="btn-contato-hero">
               ${ICONES.whatsapp} Fale Conosco
             </button>
           </div>
@@ -410,7 +410,7 @@ function renderBoloPersonalizado(bolo) {
   const caixa = !!bolo.caixaTransporte;
   const topo = !!bolo.topoPersonalizado;
 
-  const precoTotal = (peso * PRECO_BOLO_POR_KG) + (caixa ? OPCOES_BOLO.PRECO_CAIXA : 0);
+  const precoTotal = calcularPrecoBolo(peso, caixa);
 
   const pesosDisponiveis = [1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0];
   const pesoOptionsHTML = pesosDisponiveis.map(p => `
@@ -759,6 +759,7 @@ function renderCheckoutModal(carrinho) {
           </section>
 
           <!-- Formulário de Dados -->
+          <form id="form-checkout" data-form-checkout autocomplete="on">
           <section class="checkout-secao" aria-label="Dados de retirada">
             <h3 class="checkout-secao__titulo">Dados para Retirada</h3>
 
@@ -813,11 +814,13 @@ function renderCheckoutModal(carrinho) {
           <button
             class="btn btn-wpp btn-full checkout-btn-enviar"
             id="btn-enviar-whatsapp"
+            type="submit"
             data-acao="enviar-checkout"
           >
             ${ICONES.whatsapp} Finalizar Pedido no WhatsApp
           </button>
         </div>
+        </form>
 
       </div>
     </div>
@@ -854,7 +857,7 @@ function renderContactPage() {
               </p>
               <button
                 class="btn btn-wpp"
-                onclick="window.open('https://wa.me/${WHATSAPP_NUMERO}', '_blank')"
+                data-acao="abrir-whatsapp"
                 id="btn-wpp-contato"
               >
                 ${ICONES.whatsapp} (61) 99255-2565
